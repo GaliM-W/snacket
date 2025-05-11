@@ -45,15 +45,15 @@ class Snake:
         self.body.append([self.body[-1][0] + delta[0], self.body[-1][1] + delta[1], Part.HEAD])
 
         # make sure its body parts are all correct
-        if len(self.body) < 1 or not self.body[0][2] is Part.LUMP:
-            self.body.pop(0)
-        self.body[0][2] = Part.TAIL
+        if len(self.body) > 1:
+            if self.body[1][2] is Part.LUMP:
+                self.body[1][2] = Part.BODY
+            else:
+                self.body.pop(0)
+                self.body[0][2] = Part.TAIL
 
         for i in range(len(self.body) - 1):
 
             if self.body[i][2] is Part.HEAD:
                 self.body[i][2] = Part.BODY
-            if self.body[i + 1][2] is Part.LUMP:
-                self.body[i + 1][2] = Part.BODY
-                self.body[i][2] = Part.LUMP
 
