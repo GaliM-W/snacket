@@ -1,3 +1,5 @@
+import curses
+
 import unicurses
 
 from Board import Board
@@ -12,7 +14,7 @@ def main(stdscr):
     board = Board()
     board.add_snake(Snake([[0, 0, Part.TAIL], [0, 1, Part.BODY], [1, 1, Part.LUMP], [2, 1, Part.HEAD]]))
 
-    while True:
+    for i in range(10):
         time.sleep(0.1)
         stdscr.clear()
         stdscr.addstr(str(board))
