@@ -11,6 +11,8 @@ class Part(Enum):
     LUMP = 1
     BODY = 2
     TAIL = 3
+    WALL = 4
+    FOOD = 5
 
 class Snake:
 
