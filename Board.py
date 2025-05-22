@@ -1,7 +1,7 @@
 from Snake import Part
 
 
-class Board:
+class BoardView:
 
     def __init__(self, snakes=None, size=10):
         if snakes is None:

@@ -1,15 +1,15 @@
-from Board import Board
+from Board import BoardView
 from Snake import Snake, Part
 
 
 # create a board and run its lifetime
 # if you don't specify an input population, you must specify a target snake number
 def Round(round_length, board_size=10, snake_population=[], num_snakes=0):
-    
+
     print("#### BEGIN ROUND ####")
 
     #create the board and snakes
-    board = Board(size=board_size)
+    board = BoardView(size=board_size)
     i = 0
     if (snake_population == []):
         while i < num_snakes:
@@ -20,7 +20,7 @@ def Round(round_length, board_size=10, snake_population=[], num_snakes=0):
         for i in snake_population:
             board.add_snake(i)
             num_snakes += 1
-    
+
     # run the board lifetime
     turns = 0
     living_snakes = len(board.snakes)
@@ -28,7 +28,7 @@ def Round(round_length, board_size=10, snake_population=[], num_snakes=0):
         #board.tick()
         # if a snake dies, decrement living_snakes
         turns += 1
-    
+
     if living_snakes == 1:
         # select the living snake and return it
         return board.snakes[0]
@@ -61,7 +61,7 @@ def Generation(num_rounds, round_length, board_size=10, snake_population=[], num
         winsnake = Round(round_length, board_size=board_size, snake_population=snake_population, num_snakes=num_snakes)
         winners.append(winsnake)
         i += 1
-    
+
     # at this point we need to pick pairs of snakes and reproduce another full generation
     # I'm arbitrarily choosing to have them reproduce with neighbors to the right in the array
     # looping around, so final snake reproduces with the first
@@ -70,7 +70,7 @@ def Generation(num_rounds, round_length, board_size=10, snake_population=[], num
     for j in range(len(winners)):
         next_gen.append(Reproduce(winners[j], winners[(j+1)%len(winners)]))
 
-    return next_gen    
+    return next_gen
 
 
 def Epoch(num_generations, num_rounds, round_length, board_size=10, snake_population=[], num_snakes=0):

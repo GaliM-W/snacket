@@ -65,19 +65,19 @@ class Snake:
 
             if self.body[i][2] is Part.HEAD:
                 self.body[i][2] = Part.BODY
-        
-    
+
+
     def get_sensor_values(self, board, size=5):
         """
         Returns an nxn array of the objects the snake senses around its head (default is 5x5)
-        Must be an odd number, if not will -1 
-        It is aligned with the direction of the snake head 
+        Must be an odd number, if not will -1
+        It is aligned with the direction of the snake head
         """
         # wall
         # other snake
         # other snake head and direction
         # food
-        
+
         # get head position
         x, y, part = self.body[-1]
         assert part == Part.HEAD
@@ -94,7 +94,7 @@ class Snake:
                 for i in range(x-r, x+r+1):
                     for j in range(y-r, y+r+1):
                         locations.append((i,j,))
-                        
+
             case Direction.RIGHT:
                 for j in range(y+r, y-r-1, -1):
                     for i in range(x-r, x+r+1):
@@ -105,7 +105,7 @@ class Snake:
                 for i in range(x+r, x-r-1, -1):
                     for j in range(y+r, y-r-1, -1):
                         locations.append((i,j,))
-    
+
             case Direction.LEFT:
                 for j in range(y-r, y+r+1):
                     for i in range(x+r, x-r-1, -1):
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     # sn = Snake([[2,2,Part.HEAD]], facing=Direction.UP)
     sn = Snake([[2,2,Part.HEAD]], facing=Direction.LEFT)
     # sn = Snake([[0,0,Part.HEAD]])
-    from Board import Board
-    b = Board()
+    from Board import BoardView
+    b = BoardView()
     b.add_snake(sn)
     sn.get_sensor_values(b, 5)

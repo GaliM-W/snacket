@@ -1,6 +1,6 @@
 import unicurses
 
-from Board import Board
+from Board import BoardView
 from Snake import Snake, Part, Direction
 
 from curses import wrapper
@@ -9,7 +9,7 @@ import time
 def main(stdscr):
     stdscr.clear()
 
-    board = Board()
+    board = BoardView()
     board.add_snake(Snake([[0, 0, Part.TAIL], [0, 1, Part.BODY], [1, 1, Part.LUMP], [2, 1, Part.HEAD]]))
     board.add_food(5, 5)
     board.add_wall(9, 9)
