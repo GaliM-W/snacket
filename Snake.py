@@ -30,12 +30,13 @@ class Direction(Enum):
 
 
 class Part(Enum):
-    HEAD = 0
-    LUMP = 1
-    BODY = 2
-    TAIL = 3
-    WALL = 4
-    FOOD = 5
+    EMPTY = 0
+    HEAD = 1
+    LUMP = 2
+    BODY = 3
+    TAIL = 4
+    WALL = 5
+    FOOD = 6
 
     def get_char(self):
         match self:
