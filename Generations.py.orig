@@ -98,4 +98,8 @@ def Epoch(num_generations, num_rounds, round_length, board_size=10, snake_popula
     return gen_history
 
 
+<<<<<<< HEAD
+#print(Epoch(3, 5, 5, num_snakes=10))
+=======
 print(Epoch(3, 5, 5, num_snakes=10))
+>>>>>>> 86917543e03043d1ddcd91aa2df1cce4cc21fc8f
