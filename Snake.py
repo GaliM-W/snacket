@@ -17,7 +17,7 @@ class Direction(Enum):
                 return 0, 1
             case Direction.LEFT:  # left
                 return -1, 0
-        raise ValueError
+        raise ValueError(f"{self} is not a direction")
 
     def left(self):
         return Direction((self.value + 3) % 4)
@@ -29,7 +29,6 @@ class Direction(Enum):
         return Direction((self.value + 1) % 4)
 
 
-
 class Part(Enum):
     HEAD = 0
     LUMP = 1
@@ -37,6 +36,22 @@ class Part(Enum):
     TAIL = 3
     WALL = 4
     FOOD = 5
+
+    def get_char(self):
+        match self:
+            case Part.HEAD:
+                return "@"
+            case Part.LUMP:
+                return "X"
+            case Part.BODY:
+                return "+"
+            case Part.TAIL:
+                return "."
+            case Part.WALL:
+                return "0"
+            case Part.FOOD:
+                return ":"
+        raise ValueError(f"{self} is not a Part")
 
 
 class Snake:

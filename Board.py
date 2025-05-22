@@ -14,22 +14,6 @@ class BoardView:
     def __str__(self):
         return "\n".join("".join(line) for line in self.board)
 
-    def get_char(self, part):
-        match part:
-            case Part.HEAD:
-                return "@"
-            case Part.LUMP:
-                return "X"
-            case Part.BODY:
-                return "+"
-            case Part.TAIL:
-                return "."
-            case Part.WALL:
-                return "0"
-            case Part.FOOD:
-                return ":"
-        raise ValueError()
-
     def add_snake(self, snake):
         self.snakes.append(snake)
         self.redraw()
@@ -59,9 +43,9 @@ class BoardView:
             elif obstacle in "X+0":
                 snake.die()
             for part in snake.body:
-                self.board[self.wraparound(part[0])][self.wraparound(part[1])] = (
-                    self.get_char(part[2])
-                )
+                self.board[self.wraparound(part[0])][self.wraparound(part[1])] = part[
+                    2
+                ].get_char()
 
     def clear(self):
         self.board = [[" "] * self.size for i in range(self.size)]
