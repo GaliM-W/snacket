@@ -18,6 +18,7 @@ class Snake:
 
     def __init__(self, body=None, facing=Direction.RIGHT):
         self.facing = facing
+        self.dead = False
         if body is None:
             # [x, y, Part]
             self.body = [[0,0,Part.HEAD]]
@@ -29,6 +30,9 @@ class Snake:
 
     def turn_right(self):
         self.facing = Direction((self.facing.value + 1) % 4)
+
+    def die(self):
+        self.dead = True
 
     def delta(self):
         match self.facing.value:
@@ -43,6 +47,8 @@ class Snake:
         return 0, 0
 
     def tick(self):
+        if self.dead:
+            return
         # move snake
         delta = self.delta()
         self.body.append([self.body[-1][0] + delta[0], self.body[-1][1] + delta[1], Part.HEAD])
@@ -59,19 +65,19 @@ class Snake:
 
             if self.body[i][2] is Part.HEAD:
                 self.body[i][2] = Part.BODY
-        
-    
+
+
     def get_sensor_values(self, board, size=5):
         """
         Returns an nxn array of the objects the snake senses around its head (default is 5x5)
-        Must be an odd number, if not will -1 
-        It is aligned with the direction of the snake head 
+        Must be an odd number, if not will -1
+        It is aligned with the direction of the snake head
         """
         # wall
         # other snake
         # other snake head and direction
         # food
-        
+
         # get head position
         x, y, part = self.body[-1]
         assert part == Part.HEAD
@@ -88,7 +94,7 @@ class Snake:
                 for i in range(x-r, x+r+1):
                     for j in range(y-r, y+r+1):
                         locations.append((i,j,))
-                        
+
             case Direction.RIGHT:
                 for j in range(y+r, y-r-1, -1):
                     for i in range(x-r, x+r+1):
@@ -99,7 +105,7 @@ class Snake:
                 for i in range(x+r, x-r-1, -1):
                     for j in range(y+r, y-r-1, -1):
                         locations.append((i,j,))
-    
+
             case Direction.LEFT:
                 for j in range(y-r, y+r+1):
                     for i in range(x+r, x-r-1, -1):
@@ -114,7 +120,7 @@ if __name__ == "__main__":
     # sn = Snake([[2,2,Part.HEAD]], facing=Direction.UP)
     sn = Snake([[2,2,Part.HEAD]], facing=Direction.LEFT)
     # sn = Snake([[0,0,Part.HEAD]])
-    from Board import Board
-    b = Board()
+    from Board import BoardView
+    b = BoardView()
     b.add_snake(sn)
     sn.get_sensor_values(b, 5)
