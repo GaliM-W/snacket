@@ -15,7 +15,20 @@ class BoardView:
         return "\n".join("".join(line) for line in self.board)
 
     def get_char(self, part):
-        return "@X+.0:"[part.value]
+        match part:
+            case Part.HEAD:
+                return "@"
+            case Part.LUMP:
+                return "X"
+            case Part.BODY:
+                return "+"
+            case Part.TAIL:
+                return "."
+            case Part.WALL:
+                return "0"
+            case Part.FOOD:
+                return ":"
+        raise ValueError()
 
     def add_snake(self, snake):
         self.snakes.append(snake)
