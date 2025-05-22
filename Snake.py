@@ -19,6 +19,16 @@ class Direction(Enum):
                 return -1, 0
         raise ValueError
 
+    def left(self):
+        return Direction((self.value + 3) % 4)
+
+    def backwards(self):
+        return Direction((self.value + 2) % 4)
+
+    def right(self):
+        return Direction((self.value + 1) % 4)
+
+
 
 class Part(Enum):
     HEAD = 0
@@ -39,12 +49,6 @@ class Snake:
             self.body = [[0, 0, Part.HEAD]]
         else:
             self.body = body
-
-    def turn_left(self):
-        self.facing = Direction((self.facing.value + 3) % 4)
-
-    def turn_right(self):
-        self.facing = Direction((self.facing.value + 1) % 4)
 
     def die(self):
         self.dead = True
