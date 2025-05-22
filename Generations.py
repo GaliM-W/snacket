@@ -9,10 +9,10 @@ def Round(round_length, board_size=10, snake_population=[], num_snakes=0):
 
     print("#### BEGIN ROUND ####")
 
-    #create the board and snakes
+    # create the board and snakes
     board = BoardView(size=board_size)
     i = 0
-    if (snake_population == []):
+    if snake_population == []:
         while i < num_snakes:
             board.add_snake(Snake())
             i += 1
@@ -26,7 +26,7 @@ def Round(round_length, board_size=10, snake_population=[], num_snakes=0):
     turns = 0
     living_snakes = len(board.snakes)
     while turns < round_length and living_snakes > 1:
-        #board.tick()
+        # board.tick()
         # if a snake dies, decrement living_snakes
         turns += 1
 
@@ -54,13 +54,15 @@ def MutateGene(gene, mutation_chance=0.1, mutation_range=0.1):
 def Reproduce(parent1):
     # do some shit
     child = Snake()
-    #for i in range(len(child.genome)):
+    # for i in range(len(child.genome)):
     #    child.genome[i] = MutateGene(parent.genome[i])
     return child
 
 
 # run a number of rounds. again, you must specify either population OR num_snakes
-def Generation(num_rounds, round_length, board_size=10, snake_population=[], num_snakes=0):
+def Generation(
+    num_rounds, round_length, board_size=10, snake_population=[], num_snakes=0
+):
 
     print("#### BEGIN GENERATION ####")
     # tbd: number generations
@@ -69,7 +71,12 @@ def Generation(num_rounds, round_length, board_size=10, snake_population=[], num
     i = 0
     winners = []
     while i < num_rounds:
-        winsnake = Round(round_length, board_size=board_size, snake_population=snake_population, num_snakes=num_snakes)
+        winsnake = Round(
+            round_length,
+            board_size=board_size,
+            snake_population=snake_population,
+            num_snakes=num_snakes,
+        )
         winners.append(winsnake)
         i += 1
 
@@ -84,7 +91,14 @@ def Generation(num_rounds, round_length, board_size=10, snake_population=[], num
     return next_gen
 
 
-def Epoch(num_generations, num_rounds, round_length, board_size=10, snake_population=[], num_snakes=0):
+def Epoch(
+    num_generations,
+    num_rounds,
+    round_length,
+    board_size=10,
+    snake_population=[],
+    num_snakes=0,
+):
     # run a number of generations, using the output of one gen as the input for the next
 
     print("#### BEGIN EPOCH ####")
@@ -92,7 +106,9 @@ def Epoch(num_generations, num_rounds, round_length, board_size=10, snake_popula
     generation = snake_population
     gen_history = []
     while i < num_generations:
-        generation = Generation(num_rounds, round_length, board_size, generation, num_snakes)
+        generation = Generation(
+            num_rounds, round_length, board_size, generation, num_snakes
+        )
         gen_history.append(generation)
         i += 1
     return gen_history

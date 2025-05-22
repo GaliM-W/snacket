@@ -1,10 +1,12 @@
 from enum import Enum
 
+
 class Direction(Enum):
     UP = 0
     RIGHT = 1
     DOWN = 2
     LEFT = 3
+
 
 class Part(Enum):
     HEAD = 0
@@ -14,6 +16,7 @@ class Part(Enum):
     WALL = 4
     FOOD = 5
 
+
 class Snake:
 
     def __init__(self, body=None, facing=Direction.RIGHT):
@@ -21,7 +24,7 @@ class Snake:
         self.dead = False
         if body is None:
             # [x, y, Part]
-            self.body = [[0,0,Part.HEAD]]
+            self.body = [[0, 0, Part.HEAD]]
         else:
             self.body = body
 
@@ -36,13 +39,13 @@ class Snake:
 
     def delta(self):
         match self.facing.value:
-            case 0: # up
+            case 0:  # up
                 return 0, -1
-            case 1: # right
+            case 1:  # right
                 return 1, 0
-            case 2: # down
+            case 2:  # down
                 return 0, 1
-            case 3: # left
+            case 3:  # left
                 return -1, 0
         return 0, 0
 
@@ -51,7 +54,9 @@ class Snake:
             return
         # move snake
         delta = self.delta()
-        self.body.append([self.body[-1][0] + delta[0], self.body[-1][1] + delta[1], Part.HEAD])
+        self.body.append(
+            [self.body[-1][0] + delta[0], self.body[-1][1] + delta[1], Part.HEAD]
+        )
 
         # make sure its body parts are all correct
         if len(self.body) > 1:
@@ -65,7 +70,6 @@ class Snake:
 
             if self.body[i][2] is Part.HEAD:
                 self.body[i][2] = Part.BODY
-
 
     def get_sensor_values(self, board, size=5):
         """
@@ -82,45 +86,66 @@ class Snake:
         x, y, part = self.body[-1]
         assert part == Part.HEAD
 
-        assert size % 2 == 1 # size cannot be off
+        assert size % 2 == 1  # size cannot be off
         sensor_values = [[" "] * size for i in range(size)]
         r = size // 2
 
-        locations  = []
+        locations = []
 
         match self.facing:
             case Direction.UP:
                 # finding indices that surround the head direction
-                for i in range(x-r, x+r+1):
-                    for j in range(y-r, y+r+1):
-                        locations.append((i,j,))
+                for i in range(x - r, x + r + 1):
+                    for j in range(y - r, y + r + 1):
+                        locations.append(
+                            (
+                                i,
+                                j,
+                            )
+                        )
 
             case Direction.RIGHT:
-                for j in range(y+r, y-r-1, -1):
-                    for i in range(x-r, x+r+1):
-                        locations.append((i,j,))
+                for j in range(y + r, y - r - 1, -1):
+                    for i in range(x - r, x + r + 1):
+                        locations.append(
+                            (
+                                i,
+                                j,
+                            )
+                        )
 
             case Direction.DOWN:
                 # scan the board in the opposite direction to UP
-                for i in range(x+r, x-r-1, -1):
-                    for j in range(y+r, y-r-1, -1):
-                        locations.append((i,j,))
+                for i in range(x + r, x - r - 1, -1):
+                    for j in range(y + r, y - r - 1, -1):
+                        locations.append(
+                            (
+                                i,
+                                j,
+                            )
+                        )
 
             case Direction.LEFT:
-                for j in range(y-r, y+r+1):
-                    for i in range(x+r, x-r-1, -1):
-                        locations.append((i,j,))
+                for j in range(y - r, y + r + 1):
+                    for i in range(x + r, x - r - 1, -1):
+                        locations.append(
+                            (
+                                i,
+                                j,
+                            )
+                        )
 
         for i in range(size):
-            print(locations[size*i:size*i+size])
+            print(locations[size * i : size * i + size])
 
 
 if __name__ == "__main__":
     # sn = Snake([[0,0,Part.HEAD]], facing=Direction.UP)
     # sn = Snake([[2,2,Part.HEAD]], facing=Direction.UP)
-    sn = Snake([[2,2,Part.HEAD]], facing=Direction.LEFT)
+    sn = Snake([[2, 2, Part.HEAD]], facing=Direction.LEFT)
     # sn = Snake([[0,0,Part.HEAD]])
     from Board import BoardView
+
     b = BoardView()
     b.add_snake(sn)
     sn.get_sensor_values(b, 5)

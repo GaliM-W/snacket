@@ -38,13 +38,17 @@ class BoardView:
         for food in self.foods:
             self.board[food[0]][food[1]] = ":"
         for snake in self.snakes:
-            obstacle = self.board[self.wraparound(snake.body[-1][0])][self.wraparound(snake.body[-1][1])]
+            obstacle = self.board[self.wraparound(snake.body[-1][0])][
+                self.wraparound(snake.body[-1][1])
+            ]
             if obstacle == ":":
                 snake.body[-1][2] = Part.LUMP
             elif obstacle in "X+0":
                 snake.die()
             for part in snake.body:
-                self.board[self.wraparound(part[0])][self.wraparound(part[1])] = self.get_char(part[2])
+                self.board[self.wraparound(part[0])][self.wraparound(part[1])] = (
+                    self.get_char(part[2])
+                )
 
     def clear(self):
         self.board = [[" "] * self.size for i in range(self.size)]
