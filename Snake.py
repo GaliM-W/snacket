@@ -40,6 +40,8 @@ class Part(Enum):
 
     def get_char(self):
         match self:
+            case Part.EMPTY:
+                return " "
             case Part.HEAD:
                 return "@"
             case Part.LUMP:
