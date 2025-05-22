@@ -18,6 +18,7 @@ class Snake:
 
     def __init__(self, body=None, facing=Direction.RIGHT):
         self.facing = facing
+        self.dead = False
         if body is None:
             # [x, y, Part]
             self.body = [[0,0,Part.HEAD]]
@@ -29,6 +30,9 @@ class Snake:
 
     def turn_right(self):
         self.facing = Direction((self.facing.value + 1) % 4)
+
+    def die(self):
+        self.dead = True
 
     def delta(self):
         match self.facing.value:
@@ -43,6 +47,8 @@ class Snake:
         return 0, 0
 
     def tick(self):
+        if self.dead:
+            return
         # move snake
         delta = self.delta()
         self.body.append([self.body[-1][0] + delta[0], self.body[-1][1] + delta[1], Part.HEAD])

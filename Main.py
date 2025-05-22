@@ -11,6 +11,8 @@ def main(stdscr):
 
     board = Board()
     board.add_snake(Snake([[0, 0, Part.TAIL], [0, 1, Part.BODY], [1, 1, Part.LUMP], [2, 1, Part.HEAD]]))
+    board.add_food(5, 5)
+    board.add_wall(9, 9)
     key = 0
     while key != ord('Q'):
         direction = "asdw".find(chr(key))
