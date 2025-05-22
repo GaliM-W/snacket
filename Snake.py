@@ -7,6 +7,18 @@ class Direction(Enum):
     DOWN = 2
     LEFT = 3
 
+    def delta(self):
+        match self:
+            case Direction.UP:  # up
+                return 0, -1
+            case Direction.RIGHT:  # right
+                return 1, 0
+            case Direction.DOWN:  # down
+                return 0, 1
+            case Direction.LEFT:  # left
+                return -1, 0
+        raise ValueError
+
 
 class Part(Enum):
     HEAD = 0
@@ -37,23 +49,11 @@ class Snake:
     def die(self):
         self.dead = True
 
-    def delta(self):
-        match self.facing.value:
-            case 0:  # up
-                return 0, -1
-            case 1:  # right
-                return 1, 0
-            case 2:  # down
-                return 0, 1
-            case 3:  # left
-                return -1, 0
-        return 0, 0
-
     def tick(self):
         if self.dead:
             return
         # move snake
-        delta = self.delta()
+        delta = self.facing.delta()
         self.body.append(
             [self.body[-1][0] + delta[0], self.body[-1][1] + delta[1], Part.HEAD]
         )
