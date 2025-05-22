@@ -1,5 +1,6 @@
 from Board import Board
 from Snake import Snake, Part
+from random import random
 
 
 # create a board and run its lifetime
@@ -42,9 +43,19 @@ def Round(round_length, board_size=10, snake_population=[], num_snakes=0):
         return board.snakes[2]
 
 
-def Reproduce(parent1, parent2):
+def MutateGene(gene, mutation_chance=0.1, mutation_range=0.1):
+    n = random()
+    if n <= mutation_chance:
+        mutation = ((2 * mutation_range) * (random())) - mutation_range
+        gene += mutation
+    return gene
+
+
+def Reproduce(parent1):
     # do some shit
     child = Snake()
+    #for i in range(len(child.genome)):
+    #    child.genome[i] = MutateGene(parent.genome[i])
     return child
 
 
@@ -68,7 +79,7 @@ def Generation(num_rounds, round_length, board_size=10, snake_population=[], num
     j = 0
     next_gen = []
     for j in range(len(winners)):
-        next_gen.append(Reproduce(winners[j], winners[(j+1)%len(winners)]))
+        next_gen.append(Reproduce(winners[j]))
 
     return next_gen    
 
@@ -87,4 +98,4 @@ def Epoch(num_generations, num_rounds, round_length, board_size=10, snake_popula
     return gen_history
 
 
-print(Epoch(3, 5, 5, num_snakes=10))
+#print(Epoch(3, 5, 5, num_snakes=10))
