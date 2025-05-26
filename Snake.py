@@ -63,6 +63,7 @@ class Snake:
     def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5):
         self.facing = facing
         self.dead = False
+        self.score = 0
         if body is None:
             # [x, y, Part]
             self.body = [(0, 0)]
@@ -158,6 +159,7 @@ class Snake:
                 self.die()
                 return False, True
             case Part.FOOD:
+                self.score += 1
                 return True, False
             case Part.EMPTY:
                 return True, True
