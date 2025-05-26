@@ -1,4 +1,5 @@
 from enum import Enum
+import random
 
 
 class Direction(Enum):
@@ -59,7 +60,7 @@ class Part(Enum):
 
 class Snake:
 
-    def __init__(self, body=None, facing=Direction.RIGHT):
+    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5):
         self.facing = facing
         self.dead = False
         if body is None:
@@ -67,6 +68,38 @@ class Snake:
             self.body = [[0, 0, Part.HEAD]]
         else:
             self.body = body
+        self.sensor_size = sensor_size # 5x5 sensor by default
+        self.genome = self.get_random_genome()
+    
+    def get_random_genome(self, display=False):
+        """
+        Sensor is nxn based on sensor_size (default is 5x5)
+         * 4 sensory modalities (head, body, food, wall)
+         * nxn (5x5 = 25) inputs
+         * 3 directions (l, r, s) where l + r + s = 1.0
+         300 genes total
+        """
+        # mapping between each sensory modality and direction
+        genome = {}
+        sensory_modalities = "head", "body", "food", "wall"
+        for s in sensory_modalities:
+            genome[s] = [[" "] * self.sensor_size for i in range(self.sensor_size)]
+        
+        for s, w in genome.items():
+            print("\n" + s) if display == True else False
+            for i in range(self.sensor_size):
+                for j in range(self.sensor_size):
+                    weights = [random.random(), random.random(), random.random()] # left, right, straight
+
+                    # normalising so they sum to 1.0
+                    total = sum(weights)
+                    for k in range(len(weights)):
+                        weights[k] /= total
+                    
+                    w[i][j] =  weights # normalise the result so they sum to 1
+                    print(i*self.sensor_size+j, weights, "total:", sum(weights)) if display == True else False
+
+        return genome
 
     def die(self):
         self.dead = True
@@ -93,7 +126,7 @@ class Snake:
             if self.body[i][2] is Part.HEAD:
                 self.body[i][2] = Part.BODY
 
-    def get_sensor_values(self, board, size=5):
+    def get_sensor_values(self, board):
         """
         Returns an nxn array of the objects the snake senses around its head (default is 5x5)
         Must be an odd number, if not will -1
@@ -108,9 +141,9 @@ class Snake:
         x, y, part = self.body[-1]
         assert part == Part.HEAD
 
-        assert size % 2 == 1  # size cannot be off
-        sensor_values = [[" "] * size for i in range(size)]
-        r = size // 2
+        assert self.sensor_size % 2 == 1  # size cannot be off
+        sensor_values = [[" "] * self.sensor_size for i in range(self.sensor_size)]
+        r = self.sensor_size // 2
 
         locations = []
 
@@ -157,25 +190,25 @@ class Snake:
                             )
                         )
 
-        for i in range(size):
-            print(locations[size * i : size * i + size])
+        for i in range(self.sensor_size):
+            print(locations[self.sensor_size * i : self.sensor_size * i + self.sensor_size])
 
         for i in range(len(locations)):
             a, b = locations[i]
-            if a < 0 or a >=size or b < 0 or b >= size:
+            if a < 0 or a >=self.sensor_size or b < 0 or b >= self.sensor_size:
                 # if location is out of bounds, then 0
                 sensor_values[i // 5][i % 5] = 0
             else:
                 sensor_values[i // 5][i % 5] = board[a][b]
         
-        for i in range(size):
+        for i in range(self.sensor_size):
             print(sensor_values[i], end="\n")
             
 
 
 
 if __name__ == "__main__":
-    sn = Snake([[0,0,Part.HEAD]], facing=Direction.UP)
+    sn = Snake([[0,0,Part.HEAD]], facing=Direction.UP, sensor_size=5)
     # sn = Snake([[2,2,Part.HEAD]], facing=Direction.UP)
     # sn = Snake([[2, 2, Part.HEAD]], facing=Direction.DOWN)
     # sn = Snake([[0,0,Part.HEAD]])
@@ -188,6 +221,6 @@ if __name__ == "__main__":
     for i in range(5):
         board.append([i*5 + j for j in range(5)])
 
-    sn.get_sensor_values(board, 5)
-
+    sn.get_sensor_values(board)
+    sn.get_random_genome(display=True)
 
