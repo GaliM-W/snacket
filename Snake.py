@@ -63,14 +63,14 @@ class Snake:
     def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5):
         self.facing = facing
         self.dead = False
-        self.score = 0
+        self.score = 0 # score is the number of food eaten / nutrients
         if body is None:
             # [x, y, Part]
             self.body = [(0, 0)]
         else:
             self.body = body
-        self.sensor_size = sensor_size  # 5x5 sensor by default
-        self.genome = self.get_random_genome(display=True)
+        self.sensor_size = sensor_size # 5x5 sensor by default
+        self.genome = self.get_random_genome()
 
     def get_random_genome(self, display=False):
         """
