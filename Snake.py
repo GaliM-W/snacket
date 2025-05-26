@@ -63,6 +63,7 @@ class Snake:
     def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5):
         self.facing = facing
         self.dead = False
+        self.score = 0 # score is the number of food eaten / nutrients
         if body is None:
             # [x, y, Part]
             self.body = [[0, 0, Part.HEAD]]
@@ -70,6 +71,14 @@ class Snake:
             self.body = body
         self.sensor_size = sensor_size # 5x5 sensor by default
         self.genome = self.get_random_genome()
+
+    def get_size(self):
+        return len(self.body)
+    
+    def eat_snake(self): 
+        """ handles score and size increase post-snannibalism """
+        self.score += 3 # default to increasing by 3 for now
+        # Do we want to add size to the snake?... Noticing we don't have that for food functionality yet
     
     def get_random_genome(self, display=False):
         """
