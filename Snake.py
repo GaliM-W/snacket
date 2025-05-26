@@ -160,14 +160,34 @@ class Snake:
         for i in range(size):
             print(locations[size * i : size * i + size])
 
+        for i in range(len(locations)):
+            a, b = locations[i]
+            if a < 0 or a >=size or b < 0 or b >= size:
+                # if location is out of bounds, then 0
+                sensor_values[i // 5][i % 5] = 0
+            else:
+                sensor_values[i // 5][i % 5] = board[a][b]
+        
+        for i in range(size):
+            print(sensor_values[i], end="\n")
+            
+
+
 
 if __name__ == "__main__":
-    # sn = Snake([[0,0,Part.HEAD]], facing=Direction.UP)
+    sn = Snake([[0,0,Part.HEAD]], facing=Direction.UP)
     # sn = Snake([[2,2,Part.HEAD]], facing=Direction.UP)
-    sn = Snake([[2, 2, Part.HEAD]], facing=Direction.LEFT)
+    # sn = Snake([[2, 2, Part.HEAD]], facing=Direction.DOWN)
     # sn = Snake([[0,0,Part.HEAD]])
     from Board import BoardView
 
     b = BoardView()
     b.add_snake(sn)
-    sn.get_sensor_values(b, 5)
+    # replace board with test array to check
+    board = []
+    for i in range(5):
+        board.append([i*5 + j for j in range(5)])
+
+    sn.get_sensor_values(board, 5)
+
+
