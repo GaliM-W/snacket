@@ -1,4 +1,4 @@
-from Board import BoardView
+from Board import Board
 from Snake import Snake, Part
 from random import random
 
@@ -34,16 +34,16 @@ def Round(
     print("#### BEGIN ROUND ####")
 
     # create the board and snakes
-    board = BoardView(size=board_size)
+    board = Board(size=board_size)
     i = 0
     if snake_population == []:
         while i < num_snakes:
-            board.add_snake(Snake())
+            Snake().add_to_board(board)
             i += 1
     else:
         num_snakes = 0
-        for i in snake_population:
-            board.add_snake(i)
+        for snake in snake_population:
+            snake.add_to_board(board)
             num_snakes += 1
 
     # run the board lifetime
