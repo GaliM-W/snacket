@@ -4,13 +4,12 @@ from Board import Board
 from Snake import Snake, Part, Direction
 
 from curses import wrapper
-import time
 
 
 def main(stdscr):
     stdscr.clear()
 
-    board = Board()
+    board = Board(food_threshold=3)
     Snake([(0, 0), (0, 1), (1, 1), (2, 1)]).add_to_board(board)
     Snake([(5, 5), (5, 4), (4, 4), (4, 3)]).add_to_board(board)
     board.add_food(5, 5)

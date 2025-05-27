@@ -146,7 +146,7 @@ class Snake:
             # move snake head
             delta_x, delta_y = self.facing.delta()
             head_x, head_y = self.body[-1]
-            new_coordinate = (head_x + delta_x, head_y + delta_y)
+            new_coordinate = board.wraparound_pair((head_x + delta_x, head_y + delta_y))
             self.move_to(new_coordinate, board)
             if not self.dead:
                 board[new_coordinate] = Part.HEAD
