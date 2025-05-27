@@ -80,6 +80,11 @@ class Snake:
          300 genes total
         """
         # mapping between each sensory modality and direction
+        genome = {}
+        sensory_modalities = "head", "body", "food", "wall"
+        for s in sensory_modalities:
+            genome[s] = [[" "] * self.sensor_size for i in range(self.sensor_size)]
+
         sensory_modalities = Part.HEAD, Part.BODY, Part.FOOD, Part.WALL
         genome = {
             sense: [[None] * self.sensor_size for i in range(self.sensor_size)]
@@ -102,10 +107,8 @@ class Snake:
                     for k in range(len(weights)):
                         weights[k] /= total
 
-                    w[i][j] = weights  # normalise the result so they sum to 1
-
-                    if display:
-                        print(i * self.sensor_size + j, weights, "total:", sum(weights))
+                    w[i][j] =  weights # normalise the result so they sum to 1
+                    print(i*self.sensor_size+j, weights, "total:", sum(weights)) if display == True else False
 
         return genome
 
@@ -250,22 +253,18 @@ class Snake:
         for i in range(self.sensor_size):
             for j in range(self.sensor_size):
                 obj = sensor_values[i][j]
-                if display:
-                    print("obj", obj)
-                match obj:
-                    case 0:
-                        continue
-                    case Part.FOOD:
-                        l, r, u = self.genome[Part.FOOD][i][j]
-                        if display:
-                            print(l, r, u)
-                        direction[Direction.LEFT] += l
-                        direction[Direction.RIGHT] += r
-                        direction[Direction.UP] += u
-                    # keep listing other sensory modalities here as cases
-        if display:
-            print(direction)
-            print(max(direction, key=direction.get))
+                print("obj", obj) if display == True else False
+                if obj == 0:
+                    continue
+                elif obj == ":":
+                    l, r, u = self.genome["food"][i][j]
+                    print(l, r, u) if display == True else False
+                    direction[Direction.LEFT] += l
+                    direction[Direction.RIGHT] += r
+                    direction[Direction.UP] += u
+                # keep listing elif for other sensory modalities here
+        print(direction) if display == True else False
+        print(max(direction, key=direction.get)) if display == True else False
 
         # returns the key (direction) with the highest value (sum of weights)
         return max(direction, key=direction.get)
@@ -283,10 +282,10 @@ if __name__ == "__main__":
     # replace board with test array to check
     board = []
     for i in range(5):
-        board.append([i * 5 + j for j in range(5)])
+        board.append([i*5 + j for j in range(5)])
 
-    board[0][0] = Part.FOOD
-    # board[0][1] = Part.FOOD
+    board[0][0] = ":"
+    # board[0][1] = ":"
 
     sn.get_sensor_values(board)
     # sn.get_random_genome(display=True)
