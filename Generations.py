@@ -14,15 +14,22 @@ def MutateGene(gene, mutation_chance=0.1, mutation_range=0.1):
 def Reproduce(parent):
     child = Snake()
     for modality in child.genome.keys():
-        for geneSequence in range (len(parent.genome[modality])):
+        for geneSequence in range(len(parent.genome[modality])):
             for geneBlock in range(len(parent.genome[modality][geneSequence])):
-                for gene in range(len(parent.genome[modality][geneSequence][geneBlock])):
-                    child.genome[modality][geneSequence][geneBlock][gene]= MutateGene(parent.genome[modality][geneSequence][geneBlock][gene])
+                for gene in range(
+                    len(parent.genome[modality][geneSequence][geneBlock])
+                ):
+                    child.genome[modality][geneSequence][geneBlock][gene] = MutateGene(
+                        parent.genome[modality][geneSequence][geneBlock][gene]
+                    )
     return child
+
 
 # create a board and run its lifetime
 # if you don't specify an input population, you must specify a target snake number
-def Round(round_length, board_size=10, snake_population=[], num_snakes=0, display=False):
+def Round(
+    round_length, board_size=10, snake_population=[], num_snakes=0, display=False
+):
 
     print("#### BEGIN ROUND ####")
 
@@ -63,7 +70,14 @@ def Round(round_length, board_size=10, snake_population=[], num_snakes=0, displa
 
 
 # run a number of rounds. again, you must specify either population OR num_snakes
-def Generation(num_rounds, round_length, board_size=10, snake_population=[], num_snakes=0, display=False):
+def Generation(
+    num_rounds,
+    round_length,
+    board_size=10,
+    snake_population=[],
+    num_snakes=0,
+    display=False,
+):
 
     print("#### BEGIN GENERATION ####")
     # tbd: number generations
@@ -88,7 +102,7 @@ def Generation(num_rounds, round_length, board_size=10, snake_population=[], num
     next_gen = []
     for j in range(len(winners)):
         next_gen.append(Reproduce(winners[j]))
-        #next_gen.append(winners[j])
+        # next_gen.append(winners[j])
 
     return next_gen
 
@@ -100,7 +114,8 @@ def Epoch(
     board_size=10,
     snake_population=[],
     num_snakes=0,
-    display=False):
+    display=False,
+):
     # run a number of generations, using the output of one gen as the input for the next
 
     print("#### BEGIN EPOCH ####")

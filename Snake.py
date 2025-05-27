@@ -68,9 +68,9 @@ class Snake:
             self.body = [[0, 0, Part.HEAD]]
         else:
             self.body = body
-        self.sensor_size = sensor_size # 5x5 sensor by default
+        self.sensor_size = sensor_size  # 5x5 sensor by default
         self.genome = self.get_random_genome(display=True)
-    
+
     def get_random_genome(self, display=False):
         """
         Sensor is nxn based on sensor_size (default is 5x5)
@@ -84,20 +84,28 @@ class Snake:
         sensory_modalities = "head", "body", "food", "wall"
         for s in sensory_modalities:
             genome[s] = [[" "] * self.sensor_size for i in range(self.sensor_size)]
-        
+
         for s, w in genome.items():
             print("\n" + s) if display == True else False
             for i in range(self.sensor_size):
                 for j in range(self.sensor_size):
-                    weights = [random.random(), random.random(), random.random()] # left, right, up
+                    weights = [
+                        random.random(),
+                        random.random(),
+                        random.random(),
+                    ]  # left, right, up
 
                     # normalising so they sum to 1.0
                     total = sum(weights)
                     for k in range(len(weights)):
                         weights[k] /= total
-                    
-                    w[i][j] =  weights # normalise the result so they sum to 1
-                    print(i*self.sensor_size+j, weights, "total:", sum(weights)) if display == True else False
+
+                    w[i][j] = weights  # normalise the result so they sum to 1
+                    (
+                        print(i * self.sensor_size + j, weights, "total:", sum(weights))
+                        if display == True
+                        else False
+                    )
 
         return genome
 
@@ -195,14 +203,13 @@ class Snake:
 
         for i in range(len(locations)):
             a, b = locations[i]
-            if a < 0 or a >=self.sensor_size or b < 0 or b >= self.sensor_size:
+            if a < 0 or a >= self.sensor_size or b < 0 or b >= self.sensor_size:
                 # if location is out of bounds, then 0
                 sensor_values[i // 5][i % 5] = 0
             else:
                 sensor_values[i // 5][i % 5] = board[a][b]
 
         return sensor_values
-        
 
     def get_next_movement(self, board, display=False):
         """
@@ -212,7 +219,7 @@ class Snake:
         The direction with the maximum weight is returned as the next movement
         """
         sensor_values = self.get_sensor_values(board)
-        direction = { Direction.LEFT:0, Direction.RIGHT:0, Direction.UP: 0 }
+        direction = {Direction.LEFT: 0, Direction.RIGHT: 0, Direction.UP: 0}
         for i in range(self.sensor_size):
             for j in range(self.sensor_size):
                 obj = sensor_values[i][j]
@@ -228,16 +235,14 @@ class Snake:
                 # keep listing elif for other sensory modalities here
         print(direction) if display == True else False
         print(max(direction, key=direction.get)) if display == True else False
-        
+
         # returns the key (direction) with the highest value (sum of weights)
         return max(direction, key=direction.get)
-            
-
 
 
 if __name__ == "__main__":
     # sn = Snake([[0,0,Part.HEAD]], facing=Direction.UP, sensor_size=5)
-    sn = Snake([[2,2,Part.HEAD]], facing=Direction.UP)
+    sn = Snake([[2, 2, Part.HEAD]], facing=Direction.UP)
     # sn = Snake([[2, 2, Part.HEAD]], facing=Direction.DOWN)
     # sn = Snake([[0,0,Part.HEAD]])
     from Board import BoardView
@@ -247,12 +252,11 @@ if __name__ == "__main__":
     # replace board with test array to check
     board = []
     for i in range(5):
-        board.append([i*5 + j for j in range(5)])
-    
+        board.append([i * 5 + j for j in range(5)])
+
     board[0][0] = ":"
     # board[0][1] = ":"
 
     sn.get_sensor_values(board)
     # sn.get_random_genome(display=True)
     sn.get_next_movement(board, display=True)
-
