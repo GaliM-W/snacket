@@ -71,6 +71,15 @@ class Snake:
             self.body = body
         self.sensor_size = sensor_size # 5x5 sensor by default
         self.genome = self.get_random_genome()
+        self.grow = 0
+
+    def get_size(self):
+        return len(self.body)
+
+    def eat_snake(self):
+        """ handles score and size increase post-snannibalism """
+        self.score += 3 # default to increasing by 3 for now
+        # Do we want to add size to the snake?... Noticing we don't have that for food functionality yet
 
     def get_random_genome(self, display=False):
         """
@@ -129,41 +138,42 @@ class Snake:
         board[x, y] = Part.HEAD
 
     def tick(self, board):
-        shrink = True
         if not self.dead:
             # move snake head
             delta_x, delta_y = self.facing.delta()
             head_x, head_y = self.body[-1]
             new_coordinate = (head_x + delta_x, head_y + delta_y)
-            successful, shrink = self.try_move(new_coordinate, board)
+            successful = self.try_move(new_coordinate, board)
             if successful:
                 board[new_coordinate] = Part.HEAD
                 self.body.append(new_coordinate)
             board[head_x, head_y] = Part.BODY
 
-        if shrink:
+        if self.grow > 0:
+            self.grow -= 1
+        else:
             tail = self.body.pop(0)
             board[tail] = Part.EMPTY
 
     def try_move(self, coordinates, board):
         """
-        Returns (successful, no_shrink) depending on whether snake survived moving
+        Returns successful depending on whether snake survived moving
         and whether it should get shorter this round
         """
         match board[coordinates]:
             case Part.BODY | Part.HEAD | Part.LUMP | Part.TAIL:
                 # TODO: handle colliding with snake
                 self.die()
-                return False, True
+                return False
             case Part.WALL:
                 self.die()
-                return False, True
+                return False
             case Part.FOOD:
                 self.score += 1
                 self.grow += 1
-                return True, False
+                return True
             case Part.EMPTY:
-                return True, True
+                return True
             case other:
                 raise ValueError(f"{other} is not a part")
 
