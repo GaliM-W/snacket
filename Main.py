@@ -11,6 +11,7 @@ def main(stdscr):
     stdscr.clear()
 
     board = Board()
+    Snake([(0, 0), (0, 1), (1, 1), (2, 1)]).add_to_board(board)
     Snake([(5, 5), (5, 4), (4, 4), (4, 3)]).add_to_board(board)
     board.add_food(5, 5)
     board.add_wall(9, 9)

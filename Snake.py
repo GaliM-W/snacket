@@ -79,7 +79,7 @@ class Snake:
     def eat_snake(self):
         """ handles score and size increase post-snannibalism """
         self.score += 3 # default to increasing by 3 for now
-        # Do we want to add size to the snake?... Noticing we don't have that for food functionality yet
+        self.grow += 1
 
     def get_random_genome(self, display=False):
         """
