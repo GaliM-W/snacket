@@ -160,6 +160,7 @@ class Snake:
                 return False, True
             case Part.FOOD:
                 self.score += 1
+                self.grow += 1
                 return True, False
             case Part.EMPTY:
                 return True, True
