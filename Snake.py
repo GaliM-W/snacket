@@ -71,6 +71,7 @@ class Snake:
             self.body = body
         self.sensor_size = sensor_size # 5x5 sensor by default
         self.genome = self.get_random_genome()
+        self.grow = 0
 
     def get_size(self):
         return len(self.body)
@@ -126,6 +127,8 @@ class Snake:
         if len(self.body) > 1:
             if self.body[1][2] is Part.LUMP:
                 self.body[1][2] = Part.BODY
+            if self.grow > 0:
+                self.grow -= 1
             else:
                 self.body.pop(0)
                 self.body[0][2] = Part.TAIL
