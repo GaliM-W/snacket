@@ -69,14 +69,14 @@ class Snake:
         else:
             self.body = body
         self.sensor_size = sensor_size # 5x5 sensor by default
-        self.genome = self.get_random_genome()
+        self.genome = self.get_random_genome(display=True)
     
     def get_random_genome(self, display=False):
         """
         Sensor is nxn based on sensor_size (default is 5x5)
          * 4 sensory modalities (head, body, food, wall)
          * nxn (5x5 = 25) inputs
-         * 3 directions (l, r, s) where l + r + s = 1.0
+         * 3 directions (l, r, u) where l + r + u = 1.0
          300 genes total
         """
         # mapping between each sensory modality and direction
@@ -89,7 +89,7 @@ class Snake:
             print("\n" + s) if display == True else False
             for i in range(self.sensor_size):
                 for j in range(self.sensor_size):
-                    weights = [random.random(), random.random(), random.random()] # left, right, straight
+                    weights = [random.random(), random.random(), random.random()] # left, right, up
 
                     # normalising so they sum to 1.0
                     total = sum(weights)
@@ -190,8 +190,8 @@ class Snake:
                             )
                         )
 
-        for i in range(self.sensor_size):
-            print(locations[self.sensor_size * i : self.sensor_size * i + self.sensor_size])
+        # for i in range(self.sensor_size):
+        #     print(locations[self.sensor_size * i : self.sensor_size * i + self.sensor_size])
 
         for i in range(len(locations)):
             a, b = locations[i]
@@ -200,16 +200,44 @@ class Snake:
                 sensor_values[i // 5][i % 5] = 0
             else:
                 sensor_values[i // 5][i % 5] = board[a][b]
+
+        return sensor_values
         
+
+    def get_next_movement(self, board, display=False):
+        """
+        Iterates through the board
+        If an item is identfied, then will search its array for the weight
+        Weights for each direction (left, right, straight) are summed
+        The direction with the maximum weight is returned as the next movement
+        """
+        sensor_values = self.get_sensor_values(board)
+        direction = { Direction.LEFT:0, Direction.RIGHT:0, Direction.UP: 0 }
         for i in range(self.sensor_size):
-            print(sensor_values[i], end="\n")
+            for j in range(self.sensor_size):
+                obj = sensor_values[i][j]
+                print("obj", obj) if display == True else False
+                if obj == 0:
+                    continue
+                elif obj == ":":
+                    l, r, u = self.genome["food"][i][j]
+                    print(l, r, u) if display == True else False
+                    direction[Direction.LEFT] += l
+                    direction[Direction.RIGHT] += r
+                    direction[Direction.UP] += u
+                # keep listing elif for other sensory modalities here
+        print(direction) if display == True else False
+        print(max(direction, key=direction.get)) if display == True else False
+        
+        # returns the key (direction) with the highest value (sum of weights)
+        return max(direction, key=direction.get)
             
 
 
 
 if __name__ == "__main__":
-    sn = Snake([[0,0,Part.HEAD]], facing=Direction.UP, sensor_size=5)
-    # sn = Snake([[2,2,Part.HEAD]], facing=Direction.UP)
+    # sn = Snake([[0,0,Part.HEAD]], facing=Direction.UP, sensor_size=5)
+    sn = Snake([[2,2,Part.HEAD]], facing=Direction.UP)
     # sn = Snake([[2, 2, Part.HEAD]], facing=Direction.DOWN)
     # sn = Snake([[0,0,Part.HEAD]])
     from Board import BoardView
@@ -220,7 +248,11 @@ if __name__ == "__main__":
     board = []
     for i in range(5):
         board.append([i*5 + j for j in range(5)])
+    
+    board[0][0] = ":"
+    # board[0][1] = ":"
 
     sn.get_sensor_values(board)
-    sn.get_random_genome(display=True)
+    # sn.get_random_genome(display=True)
+    sn.get_next_movement(board, display=True)
 
