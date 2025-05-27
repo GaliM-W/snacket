@@ -42,6 +42,7 @@ class Board:
                         snake_b.die()
                         dead_snakes.append(snake_b)
                         snake_a.eat_snake()
+                        snake_a.body[-1][2] = Part.LUMP
                     else:
                         # the attacker is too small, it dies from the collision
                         snake_a.die()

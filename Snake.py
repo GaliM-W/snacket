@@ -149,7 +149,7 @@ class Snake:
                 self.body.append(new_coordinate)
             board[head_x, head_y] = Part.BODY
 
-        if self.grow > 0:
+        if self.grow > 0: # handle snake growth
             self.grow -= 1
         else:
             tail = self.body.pop(0)
