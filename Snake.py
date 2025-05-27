@@ -39,7 +39,7 @@ class Part(Enum):
     WALL = 5
     FOOD = 6
 
-    def get_char(self):
+    def __str__(self):
         match self:
             case Part.EMPTY:
                 return " "
@@ -66,7 +66,7 @@ class Snake:
         self.score = 0 # score is the number of food eaten / nutrients
         if body is None:
             # [x, y, Part]
-            self.body = [[0, 0, Part.HEAD]]
+            self.body = [(0, 0)]
         else:
             self.body = body
         self.sensor_size = sensor_size # 5x5 sensor by default
@@ -75,18 +75,18 @@ class Snake:
 
     def get_size(self):
         return len(self.body)
-    
-    def eat_snake(self): 
+
+    def eat_snake(self):
         """ handles score and size increase post-snannibalism """
         self.score += 3 # default to increasing by 3 for now
         self.grow += 1
-    
+
     def get_random_genome(self, display=False):
         """
         Sensor is nxn based on sensor_size (default is 5x5)
          * 4 sensory modalities (head, body, food, wall)
          * nxn (5x5 = 25) inputs
-         * 3 directions (l, r, s) where l + r + s = 1.0
+         * 3 directions (l, r, u) where l + r + u = 1.0
          300 genes total
         """
         # mapping between each sensory modality and direction
@@ -94,18 +94,29 @@ class Snake:
         sensory_modalities = "head", "body", "food", "wall"
         for s in sensory_modalities:
             genome[s] = [[" "] * self.sensor_size for i in range(self.sensor_size)]
-        
+
+        sensory_modalities = Part.HEAD, Part.BODY, Part.FOOD, Part.WALL
+        genome = {
+            sense: [[None] * self.sensor_size for i in range(self.sensor_size)]
+            for sense in sensory_modalities
+        }
+
         for s, w in genome.items():
-            print("\n" + s) if display == True else False
+            if display:
+                print("\n" + str(s))
             for i in range(self.sensor_size):
                 for j in range(self.sensor_size):
-                    weights = [random.random(), random.random(), random.random()] # left, right, straight
+                    weights = [
+                        random.random(),
+                        random.random(),
+                        random.random(),
+                    ]  # left, right, up
 
                     # normalising so they sum to 1.0
                     total = sum(weights)
                     for k in range(len(weights)):
                         weights[k] /= total
-                    
+
                     w[i][j] =  weights # normalise the result so they sum to 1
                     print(i*self.sensor_size+j, weights, "total:", sum(weights)) if display == True else False
 
@@ -114,33 +125,59 @@ class Snake:
     def die(self):
         self.dead = True
 
-    def tick(self):
-        if self.dead:
-            return
-        # move snake
-        delta = self.facing.delta()
-        self.body.append(
-            [self.body[-1][0] + delta[0], self.body[-1][1] + delta[1], Part.HEAD]
-        )
-
-        # make sure its body parts are all correct
+    def add_to_board(self, board):
+        board.snakes.append(self)
+        if not self.body:
+            raise ValueError("Snake has no length")
         if len(self.body) > 1:
-            if self.body[1][2] is Part.LUMP:
-                self.body[1][2] = Part.BODY
+            x, y = self.body[0]
+            board[x, y] = Part.TAIL
+            for x, y in self.body[1:-1]:
+                board[x, y] = Part.BODY
+        x, y = self.body[-1]
+        board[x, y] = Part.HEAD
 
-            if self.grow > 0: # handle snake growth
-                self.grow -= 1
+    def tick(self, board):
+        if not self.dead:
+            # move snake head
+            delta_x, delta_y = self.facing.delta()
+            head_x, head_y = self.body[-1]
+            new_coordinate = (head_x + delta_x, head_y + delta_y)
+            successful = self.try_move(new_coordinate, board)
+            if successful:
+                board[new_coordinate] = Part.HEAD
+                self.body.append(new_coordinate)
+            board[head_x, head_y] = Part.BODY
 
-            else:
-                self.body.pop(0)
-                self.body[0][2] = Part.TAIL
+        if self.grow > 0: # handle snake growth
+            self.grow -= 1
+        else:
+            tail = self.body.pop(0)
+            board[tail] = Part.EMPTY
 
-        for i in range(len(self.body) - 1):
+    def try_move(self, coordinates, board):
+        """
+        Returns successful depending on whether snake survived moving
+        and whether it should get shorter this round
+        """
+        match board[coordinates]:
+            case Part.BODY | Part.HEAD | Part.LUMP | Part.TAIL:
+                # TODO: handle colliding with snake
+                self.die()
+                return False
+            case Part.WALL:
+                self.die()
+                return False
+            case Part.FOOD:
+                self.score += 1
+                self.grow += 1
+                return True
+            case Part.EMPTY:
+                return True
+            case other:
+                raise ValueError(f"{other} is not a part")
 
-            if self.body[i][2] is Part.HEAD:
-                self.body[i][2] = Part.BODY
-
-    def get_sensor_values(self, board):
+    def get_sensor_values(self, grid):
         """
         Returns an nxn array of the objects the snake senses around its head (default is 5x5)
         Must be an odd number, if not will -1
@@ -152,11 +189,11 @@ class Snake:
         # food
 
         # get head position
-        x, y, part = self.body[-1]
-        assert part == Part.HEAD
+        x, y = self.body[-1]
+        assert grid[x][y] == Part.HEAD, grid
 
         assert self.sensor_size % 2 == 1  # size cannot be off
-        sensor_values = [[" "] * self.sensor_size for i in range(self.sensor_size)]
+        sensor_values = [[None] * self.sensor_size for i in range(self.sensor_size)]
         r = self.sensor_size // 2
 
         locations = []
@@ -204,37 +241,65 @@ class Snake:
                             )
                         )
 
-        for i in range(self.sensor_size):
-            print(locations[self.sensor_size * i : self.sensor_size * i + self.sensor_size])
+        # for i in range(self.sensor_size):
+        #     print(locations[self.sensor_size * i : self.sensor_size * i + self.sensor_size])
 
         for i in range(len(locations)):
             a, b = locations[i]
-            if a < 0 or a >=self.sensor_size or b < 0 or b >= self.sensor_size:
+            if a < 0 or a >= self.sensor_size or b < 0 or b >= self.sensor_size:
                 # if location is out of bounds, then 0
                 sensor_values[i // 5][i % 5] = 0
             else:
-                sensor_values[i // 5][i % 5] = board[a][b]
-        
-        for i in range(self.sensor_size):
-            print(sensor_values[i], end="\n")
-            
+                sensor_values[i // 5][i % 5] = grid[a][b]
 
+        return sensor_values
+
+    def get_next_movement(self, board, display=False):
+        """
+        Iterates through the board
+        If an item is identfied, then will search its array for the weight
+        Weights for each direction (left, right, straight) are summed
+        The direction with the maximum weight is returned as the next movement
+        """
+        sensor_values = self.get_sensor_values(board)
+        direction = {Direction.LEFT: 0, Direction.RIGHT: 0, Direction.UP: 0}
+        for i in range(self.sensor_size):
+            for j in range(self.sensor_size):
+                obj = sensor_values[i][j]
+                print("obj", obj) if display == True else False
+                if obj == 0:
+                    continue
+                elif obj == ":":
+                    l, r, u = self.genome["food"][i][j]
+                    print(l, r, u) if display == True else False
+                    direction[Direction.LEFT] += l
+                    direction[Direction.RIGHT] += r
+                    direction[Direction.UP] += u
+                # keep listing elif for other sensory modalities here
+        print(direction) if display == True else False
+        print(max(direction, key=direction.get)) if display == True else False
+
+        # returns the key (direction) with the highest value (sum of weights)
+        return max(direction, key=direction.get)
 
 
 if __name__ == "__main__":
-    sn = Snake([[0,0,Part.HEAD]], facing=Direction.UP, sensor_size=5)
-    # sn = Snake([[2,2,Part.HEAD]], facing=Direction.UP)
-    # sn = Snake([[2, 2, Part.HEAD]], facing=Direction.DOWN)
-    # sn = Snake([[0,0,Part.HEAD]])
-    from Board import BoardView
+    # sn = Snake([(0,0)], facing=Direction.UP, sensor_size=5)
+    sn = Snake([(2, 2)], facing=Direction.UP)
+    # sn = Snake([(2, 2)], facing=Direction.DOWN)
+    # sn = Snake([(0,0)])
+    from Board import Board
 
-    b = BoardView()
-    b.add_snake(sn)
+    b = Board()
+    sn.add_to_board(b)
     # replace board with test array to check
     board = []
     for i in range(5):
         board.append([i*5 + j for j in range(5)])
 
-    sn.get_sensor_values(board)
-    sn.get_random_genome(display=True)
+    board[0][0] = ":"
+    # board[0][1] = ":"
 
+    sn.get_sensor_values(board)
+    # sn.get_random_genome(display=True)
+    sn.get_next_movement(board, display=True)

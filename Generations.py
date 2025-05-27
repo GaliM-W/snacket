@@ -1,34 +1,60 @@
-from Board import BoardView
+from Board import Board
 from Snake import Snake, Part
 from random import random
 
 
+def MutateGene(gene, mutation_chance=0.1, mutation_range=0.1):
+    n = random()
+    if n <= mutation_chance:
+        mutation = ((2 * mutation_range) * (random())) - mutation_range
+        gene += mutation
+    return gene
+
+
+def Reproduce(parent):
+    child = Snake()
+    for modality in child.genome.keys():
+        for geneSequence in range(len(parent.genome[modality])):
+            for geneBlock in range(len(parent.genome[modality][geneSequence])):
+                for gene in range(
+                    len(parent.genome[modality][geneSequence][geneBlock])
+                ):
+                    child.genome[modality][geneSequence][geneBlock][gene] = MutateGene(
+                        parent.genome[modality][geneSequence][geneBlock][gene]
+                    )
+    return child
+
+
 # create a board and run its lifetime
 # if you don't specify an input population, you must specify a target snake number
-def Round(round_length, board_size=10, snake_population=[], num_snakes=0):
+def Round(
+    round_length, board_size=10, snake_population=[], num_snakes=0, display=False
+):
 
     print("#### BEGIN ROUND ####")
 
     # create the board and snakes
-    board = BoardView(size=board_size)
+    board = Board(size=board_size)
     i = 0
     if snake_population == []:
         while i < num_snakes:
-            board.add_snake(Snake())
+            Snake().add_to_board(board)
             i += 1
     else:
         num_snakes = 0
-        for i in snake_population:
-            board.add_snake(i)
+        for snake in snake_population:
+            snake.add_to_board(board)
             num_snakes += 1
 
     # run the board lifetime
     turns = 0
     living_snakes = len(board.snakes)
+    print(f"{living_snakes} living snakes")
     while turns < round_length and living_snakes > 1:
-        # board.tick()
+        board.tick()
         # if a snake dies, decrement living_snakes
         turns += 1
+        print(f"turn {turns}")
 
     if living_snakes == 1:
         # select the living snake and return it
@@ -43,25 +69,14 @@ def Round(round_length, board_size=10, snake_population=[], num_snakes=0):
         return board.snakes[2]
 
 
-def MutateGene(gene, mutation_chance=0.1, mutation_range=0.1):
-    n = random()
-    if n <= mutation_chance:
-        mutation = ((2 * mutation_range) * (random())) - mutation_range
-        gene += mutation
-    return gene
-
-
-def Reproduce(parent1):
-    # do some shit
-    child = Snake()
-    # for i in range(len(child.genome)):
-    #    child.genome[i] = MutateGene(parent.genome[i])
-    return child
-
-
 # run a number of rounds. again, you must specify either population OR num_snakes
 def Generation(
-    num_rounds, round_length, board_size=10, snake_population=[], num_snakes=0
+    num_rounds,
+    round_length,
+    board_size=10,
+    snake_population=[],
+    num_snakes=0,
+    display=False,
 ):
 
     print("#### BEGIN GENERATION ####")
@@ -87,6 +102,7 @@ def Generation(
     next_gen = []
     for j in range(len(winners)):
         next_gen.append(Reproduce(winners[j]))
+        # next_gen.append(winners[j])
 
     return next_gen
 
@@ -98,6 +114,7 @@ def Epoch(
     board_size=10,
     snake_population=[],
     num_snakes=0,
+    display=False,
 ):
     # run a number of generations, using the output of one gen as the input for the next
 
@@ -114,4 +131,4 @@ def Epoch(
     return gen_history
 
 
-print(Epoch(3, 5, 5, num_snakes=10))
+Epoch(3, 10, 5, num_snakes=10)
