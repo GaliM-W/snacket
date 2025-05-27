@@ -63,13 +63,13 @@ class Snake:
     def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5):
         self.facing = facing
         self.dead = False
-        self.score = 0 # score is the number of food eaten / nutrients
+        self.score = 0  # score is the number of food eaten / nutrients
         if body is None:
             # [x, y, Part]
             self.body = [(0, 0)]
         else:
             self.body = body
-        self.sensor_size = sensor_size # 5x5 sensor by default
+        self.sensor_size = sensor_size  # 5x5 sensor by default
         self.genome = self.get_random_genome()
         self.grow = 0
 
@@ -77,8 +77,8 @@ class Snake:
         return len(self.body)
 
     def eat_snake(self):
-        """ handles score and size increase post-snannibalism """
-        self.score += 3 # default to increasing by 3 for now
+        """handles score and size increase post-snannibalism"""
+        self.score += 3  # default to increasing by 3 for now
         self.grow += 1
 
     def get_random_genome(self, display=False):
@@ -117,8 +117,12 @@ class Snake:
                     for k in range(len(weights)):
                         weights[k] /= total
 
-                    w[i][j] =  weights # normalise the result so they sum to 1
-                    print(i*self.sensor_size+j, weights, "total:", sum(weights)) if display == True else False
+                    w[i][j] = weights  # normalise the result so they sum to 1
+                    (
+                        print(i * self.sensor_size + j, weights, "total:", sum(weights))
+                        if display == True
+                        else False
+                    )
 
         return genome
 
@@ -143,37 +147,41 @@ class Snake:
             delta_x, delta_y = self.facing.delta()
             head_x, head_y = self.body[-1]
             new_coordinate = (head_x + delta_x, head_y + delta_y)
-            successful = self.try_move(new_coordinate, board)
-            if successful:
+            self.move_to(new_coordinate, board)
+            if not self.dead:
                 board[new_coordinate] = Part.HEAD
                 self.body.append(new_coordinate)
             board[head_x, head_y] = Part.BODY
 
-        if self.grow > 0: # handle snake growth
+        if self.grow > 0:  # handle snake growth
             self.grow -= 1
+            if len(self.body) > 1:
+                neck = self.body[-2]
+                board[neck] = Part.LUMP
         else:
             tail = self.body.pop(0)
             board[tail] = Part.EMPTY
 
-    def try_move(self, coordinates, board):
-        """
-        Returns successful depending on whether snake survived moving
-        and whether it should get shorter this round
-        """
+    def move_to(self, coordinates, board):
         match board[coordinates]:
             case Part.BODY | Part.HEAD | Part.LUMP | Part.TAIL:
-                # TODO: handle colliding with snake
-                self.die()
-                return False
+                hit_snake = board.snake_at(*coordinates)
+                size_difference = self.get_size() - hit_snake.get_size()
+                if self == hit_snake:
+                    self.die()
+                elif size_difference >= 3:  # 3 is arbitrary threshold for now
+                    # attacker self is larger by at least 3, it eats hit_snake
+                    hit_snake.die()  # TODO: this should only take effect after all snakes have moved
+                else:
+                    # the attacker is too small, it dies from the collision
+                    self.die()
             case Part.WALL:
                 self.die()
-                return False
             case Part.FOOD:
                 self.score += 1
                 self.grow += 1
-                return True
             case Part.EMPTY:
-                return True
+                pass
             case other:
                 raise ValueError(f"{other} is not a part")
 
@@ -295,7 +303,7 @@ if __name__ == "__main__":
     # replace board with test array to check
     board = []
     for i in range(5):
-        board.append([i*5 + j for j in range(5)])
+        board.append([i * 5 + j for j in range(5)])
 
     board[0][0] = ":"
     # board[0][1] = ":"
