@@ -81,45 +81,6 @@ class Snake:
         self.score += 3  # default to increasing by 3 for now
         self.grow += 1
 
-    def get_random_genome(self, display=False):
-        """
-        Sensor is nxn based on sensor_size (default is 5x5)
-         * 4 sensory modalities (head, body, food, wall)
-         * nxn (5x5 = 25) inputs
-         * 3 directions (l, r, u) where l + r + u = 1.0
-         300 genes total
-        """
-        # mapping between each sensory modality and direction
-        genome = {}
-
-        sensory_modalities = Part.HEAD, Part.BODY, Part.FOOD, Part.WALL
-        genome = {
-            sense: [[None] * self.sensor_size for i in range(self.sensor_size)]
-            for sense in sensory_modalities
-        }
-
-        for s, w in genome.items():
-            if display:
-                print("\n" + str(s))
-            for i in range(self.sensor_size):
-                for j in range(self.sensor_size):
-                    weights = [
-                        random.random(),
-                        random.random(),
-                        random.random(),
-                    ]  # left, right, up
-
-                    # normalising so they sum to 1.0
-                    total = sum(weights)
-                    for k in range(len(weights)):
-                        weights[k] /= total
-
-                    w[i][j] = weights  # normalise the result so they sum to 1
-                    if display:
-                        print(i * self.sensor_size + j, weights, "total:", sum(weights))
-
-        return genome
-
     def die(self):
         self.dead = True
 
@@ -178,6 +139,45 @@ class Snake:
                 pass
             case other:
                 raise ValueError(f"{other} is not a part")
+
+    def get_random_genome(self, display=False):
+        """
+        Sensor is nxn based on sensor_size (default is 5x5)
+         * 4 sensory modalities (head, body, food, wall)
+         * nxn (5x5 = 25) inputs
+         * 3 directions (l, r, u) where l + r + u = 1.0
+         300 genes total
+        """
+        # mapping between each sensory modality and direction
+        genome = {}
+
+        sensory_modalities = Part.HEAD, Part.BODY, Part.FOOD, Part.WALL
+        genome = {
+            sense: [[None] * self.sensor_size for i in range(self.sensor_size)]
+            for sense in sensory_modalities
+        }
+
+        for s, w in genome.items():
+            if display:
+                print("\n" + str(s))
+            for i in range(self.sensor_size):
+                for j in range(self.sensor_size):
+                    weights = [
+                        random.random(),
+                        random.random(),
+                        random.random(),
+                    ]  # left, right, up
+
+                    # normalising so they sum to 1.0
+                    total = sum(weights)
+                    for k in range(len(weights)):
+                        weights[k] /= total
+
+                    w[i][j] = weights  # normalise the result so they sum to 1
+                    if display:
+                        print(i * self.sensor_size + j, weights, "total:", sum(weights))
+
+        return genome
 
     def get_sensor_values(self, grid):
         """
