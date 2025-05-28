@@ -172,6 +172,7 @@ class Snake:
                 elif size_difference >= 3:  # 3 is arbitrary threshold for now
                     # attacker self is larger by at least 3, it eats hit_snake
                     hit_snake.die()  # TODO: this should only take effect after all snakes have moved
+                    self.eat_snake()
                 else:
                     # the attacker is too small, it dies from the collision
                     self.die()
