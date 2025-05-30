@@ -27,9 +27,7 @@ def Reproduce(parent):
 
 # create a board and run its lifetime
 # if you don't specify an input population, you must specify a target snake number
-def Round(
-    round_length, board_size=10, snake_population=None, num_snakes=0, display=False
-):
+def Round(round_length, board_size=10, snake_population=None, num_snakes=0):
 
     print("#### BEGIN ROUND ####")
 
@@ -68,14 +66,7 @@ def Round(
 
 
 # run a number of rounds. again, you must specify either population OR num_snakes
-def Generation(
-    num_rounds,
-    round_length,
-    board_size=10,
-    snake_population=None,
-    num_snakes=0,
-    display=False,
-):
+def Generation(num_rounds, round_length, **kwargs):
 
     print("#### BEGIN GENERATION ####")
 
@@ -84,12 +75,7 @@ def Generation(
     # run a number of rounds per generation and collect winners
     winners = []
     for i in range(num_rounds):
-        winsnake = Round(
-            round_length,
-            board_size=board_size,
-            snake_population=snake_population,
-            num_snakes=num_snakes,
-        )
+        winsnake = Round(round_length, **kwargs)
         winners.append(winsnake)
 
     # at this point we need to pick pairs of snakes and reproduce another full generation
@@ -104,28 +90,14 @@ def Generation(
     return next_gen
 
 
-def Epoch(
-    num_generations,
-    num_rounds,
-    round_length,
-    board_size=10,
-    snake_population=None,
-    num_snakes=0,
-    display=False,
-):
+def Epoch(num_generations, num_rounds, round_length, snake_population=(), **kwargs):
     # run a number of generations, using the output of one gen as the input for the next
 
     print("#### BEGIN EPOCH ####")
-    generation = snake_population
+    generation = list(snake_population)
     gen_history = []
     for i in range(num_generations):
-        generation = Generation(
-            num_rounds,
-            round_length,
-            board_size,
-            snake_population=generation,
-            num_snakes=num_snakes,
-        )
+        generation = Generation(num_rounds, round_length, **kwargs)
         gen_history.append(generation)
     return gen_history
 
