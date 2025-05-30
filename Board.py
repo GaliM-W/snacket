@@ -10,6 +10,7 @@ class Board:
         self.food_countdown = food_delay
         self.food_threshold = food_threshold
         self.snakes = []
+        self.historical_snakes = set()
         for snake in snakes:
             snake.add_to_board(self)
 
@@ -62,3 +63,6 @@ class Board:
             if self.wraparound_pair((x, y)) in snake.body:
                 return snake
         return None
+
+    def living_snakes(self):
+        return [snake for snake in self.snakes if not snake.dead]

@@ -73,6 +73,11 @@ class Snake:
         self.genome = self.get_random_genome()
         self.grow = 0
 
+    def __repr__(self):
+        if self.dead:
+            return f"<Snake score={self.score} (dead) {self.body}>"
+        return f"<Snake score={self.score} {self.body}>"
+
     def get_size(self):
         return len(self.body)
 
@@ -86,8 +91,9 @@ class Snake:
 
     def add_to_board(self, board):
         board.snakes.append(self)
+        board.historical_snakes.add(self)
         if not self.body:
-            raise ValueError("Snake has no length")
+            raise ValueError(f"Snake {self} has no length")
         if len(self.body) > 1:
             x, y = self.body[0]
             board[x, y] = Part.TAIL
@@ -95,6 +101,27 @@ class Snake:
                 board[x, y] = Part.BODY
         x, y = self.body[-1]
         board[x, y] = Part.HEAD
+
+    def random_position(self, board, reset=False):
+        free = [
+            (i, j)
+            for i, row in enumerate(board.grid)
+            for j, spot in enumerate(row)
+            if spot == Part.EMPTY
+        ]
+        self.grow = 2
+        self.body = [random.choice(free)]
+        self.facing = random.choice(
+            [
+                Direction.UP,
+                Direction.RIGHT,
+                Direction.DOWN,
+                Direction.LEFT,
+            ]
+        )
+        if reset:
+            self.dead = False
+            self.score = 0
 
     def tick(self, board):
         if not self.dead:
