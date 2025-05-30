@@ -35,13 +35,11 @@ def Round(
 
     # create the board and snakes
     board = Board(size=board_size)
-    i = 0
     if snake_population is None:
-        while i < num_snakes:
+        for i in range(num_snakes):
             snake = Snake()
             snake.random_position(board, reset=False)
             snake.add_to_board(board)
-            i += 1
     else:
         num_snakes = 0
         for snake in snake_population:
@@ -82,9 +80,8 @@ def Generation(
     # tbd: number generations
 
     # run a number of rounds per generation and collect winners
-    i = 0
     winners = []
-    while i < num_rounds:
+    for i in range(num_rounds):
         winsnake = Round(
             round_length,
             board_size=board_size,
@@ -92,7 +89,6 @@ def Generation(
             num_snakes=num_snakes,
         )
         winners.append(winsnake)
-        i += 1
 
     # at this point we need to pick pairs of snakes and reproduce another full generation
     # I'm arbitrarily choosing to have them reproduce with neighbors to the right in the array
@@ -118,10 +114,9 @@ def Epoch(
     # run a number of generations, using the output of one gen as the input for the next
 
     print("#### BEGIN EPOCH ####")
-    i = 0
     generation = snake_population
     gen_history = []
-    while i < num_generations:
+    for i in range(num_generations):
         generation = Generation(
             num_rounds,
             round_length,
@@ -130,7 +125,6 @@ def Epoch(
             num_snakes=num_snakes,
         )
         gen_history.append(generation)
-        i += 1
     return gen_history
 
 
