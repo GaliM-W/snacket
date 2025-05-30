@@ -81,51 +81,6 @@ class Snake:
         self.score += 3  # default to increasing by 3 for now
         self.grow += 1
 
-    def get_random_genome(self, display=False):
-        """
-        Sensor is nxn based on sensor_size (default is 5x5)
-         * 4 sensory modalities (head, body, food, wall)
-         * nxn (5x5 = 25) inputs
-         * 3 directions (l, r, u) where l + r + u = 1.0
-         300 genes total
-        """
-        # mapping between each sensory modality and direction
-        genome = {}
-        sensory_modalities = "head", "body", "food", "wall"
-        for s in sensory_modalities:
-            genome[s] = [[" "] * self.sensor_size for i in range(self.sensor_size)]
-
-        sensory_modalities = Part.HEAD, Part.BODY, Part.FOOD, Part.WALL
-        genome = {
-            sense: [[None] * self.sensor_size for i in range(self.sensor_size)]
-            for sense in sensory_modalities
-        }
-
-        for s, w in genome.items():
-            if display:
-                print("\n" + str(s))
-            for i in range(self.sensor_size):
-                for j in range(self.sensor_size):
-                    weights = [
-                        random.random(),
-                        random.random(),
-                        random.random(),
-                    ]  # left, right, up
-
-                    # normalising so they sum to 1.0
-                    total = sum(weights)
-                    for k in range(len(weights)):
-                        weights[k] /= total
-
-                    w[i][j] = weights  # normalise the result so they sum to 1
-                    (
-                        print(i * self.sensor_size + j, weights, "total:", sum(weights))
-                        if display == True
-                        else False
-                    )
-
-        return genome
-
     def die(self):
         self.dead = True
 
@@ -186,6 +141,45 @@ class Snake:
             case other:
                 raise ValueError(f"{other} is not a part")
 
+    def get_random_genome(self, display=False):
+        """
+        Sensor is nxn based on sensor_size (default is 5x5)
+         * 4 sensory modalities (head, body, food, wall)
+         * nxn (5x5 = 25) inputs
+         * 3 directions (l, r, u) where l + r + u = 1.0
+         300 genes total
+        """
+        # mapping between each sensory modality and direction
+        genome = {}
+
+        sensory_modalities = Part.HEAD, Part.BODY, Part.FOOD, Part.WALL
+        genome = {
+            sense: [[None] * self.sensor_size for i in range(self.sensor_size)]
+            for sense in sensory_modalities
+        }
+
+        for s, w in genome.items():
+            if display:
+                print("\n" + str(s))
+            for i in range(self.sensor_size):
+                for j in range(self.sensor_size):
+                    weights = [
+                        random.random(),
+                        random.random(),
+                        random.random(),
+                    ]  # left, right, up
+
+                    # normalising so they sum to 1.0
+                    total = sum(weights)
+                    for k in range(len(weights)):
+                        weights[k] /= total
+
+                    w[i][j] = weights  # normalise the result so they sum to 1
+                    if display:
+                        print(i * self.sensor_size + j, weights, "total:", sum(weights))
+
+        return genome
+
     def get_sensor_values(self, grid):
         """
         Returns an nxn array of the objects the snake senses around its head (default is 5x5)
@@ -205,56 +199,28 @@ class Snake:
         sensor_values = [[None] * self.sensor_size for i in range(self.sensor_size)]
         r = self.sensor_size // 2
 
-        locations = []
-
         match self.facing:
             case Direction.UP:
                 # finding indices that surround the head direction
-                for i in range(x - r, x + r + 1):
-                    for j in range(y - r, y + r + 1):
-                        locations.append(
-                            (
-                                i,
-                                j,
-                            )
-                        )
+                i_range = range(x - r, x + r + 1)
+                j_range = range(y - r, y + r + 1)
 
             case Direction.RIGHT:
-                for j in range(y + r, y - r - 1, -1):
-                    for i in range(x - r, x + r + 1):
-                        locations.append(
-                            (
-                                i,
-                                j,
-                            )
-                        )
+                i_range = range(y + r, y - r - 1, -1)
+                j_range = range(x - r, x + r + 1)
 
             case Direction.DOWN:
                 # scan the board in the opposite direction to UP
-                for i in range(x + r, x - r - 1, -1):
-                    for j in range(y + r, y - r - 1, -1):
-                        locations.append(
-                            (
-                                i,
-                                j,
-                            )
-                        )
+                i_range = range(x + r, x - r - 1, -1)
+                j_range = range(y + r, y - r - 1, -1)
 
             case Direction.LEFT:
-                for j in range(y - r, y + r + 1):
-                    for i in range(x + r, x - r - 1, -1):
-                        locations.append(
-                            (
-                                i,
-                                j,
-                            )
-                        )
+                i_range = range(y - r, y + r + 1)
+                j_range = range(x + r, x - r - 1, -1)
 
-        # for i in range(self.sensor_size):
-        #     print(locations[self.sensor_size * i : self.sensor_size * i + self.sensor_size])
+        locations = [(i, j) for j in i_range for i in j_range]
 
-        for i in range(len(locations)):
-            a, b = locations[i]
+        for i, (a, b) in enumerate(locations):
             if a < 0 or a >= self.sensor_size or b < 0 or b >= self.sensor_size:
                 # if location is out of bounds, then 0
                 sensor_values[i // 5][i % 5] = 0
@@ -275,18 +241,43 @@ class Snake:
         for i in range(self.sensor_size):
             for j in range(self.sensor_size):
                 obj = sensor_values[i][j]
-                print("obj", obj) if display == True else False
-                if obj == 0:
-                    continue
-                elif obj == ":":
-                    l, r, u = self.genome["food"][i][j]
-                    print(l, r, u) if display == True else False
-                    direction[Direction.LEFT] += l
-                    direction[Direction.RIGHT] += r
-                    direction[Direction.UP] += u
+                if display:
+                    print("obj", obj)
+                match obj:
+                    case Part.EMPTY:
+                        continue
+                    case Part.FOOD:
+                        l, r, u = self.genome[Part.FOOD][i][j]
+                        if display:
+                            print(l, r, u)
+                        direction[Direction.LEFT] += l
+                        direction[Direction.RIGHT] += r
+                        direction[Direction.UP] += u
+                    case Part.BODY | Part.TAIL | Part.LUMP:
+                        l, r, u = self.genome[Part.BODY][i][j]
+                        if display:
+                            print(l, r, u)
+                        direction[Direction.LEFT] += l
+                        direction[Direction.RIGHT] += r
+                        direction[Direction.UP] += u
+                    case Part.HEAD:
+                        l, r, u = self.genome[Part.HEAD][i][j]
+                        if display:
+                            print(l, r, u)
+                        direction[Direction.LEFT] += l
+                        direction[Direction.RIGHT] += r
+                        direction[Direction.UP] += u
+                    case Part.WALL:
+                        l, r, u = self.genome[Part.WALL][i][j]
+                        if display:
+                            print(l, r, u)
+                        direction[Direction.LEFT] += l
+                        direction[Direction.RIGHT] += r
+                        direction[Direction.UP] += u
                 # keep listing elif for other sensory modalities here
-        print(direction) if display == True else False
-        print(max(direction, key=direction.get)) if display == True else False
+        if display:
+            print(direction)
+            print(max(direction, key=direction.get))
 
         # returns the key (direction) with the highest value (sum of weights)
         return max(direction, key=direction.get)
