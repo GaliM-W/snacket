@@ -1,5 +1,4 @@
 from Board import Part, Direction
-from enum import Enum
 import random
 
 
