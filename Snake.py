@@ -207,7 +207,7 @@ class Snake:
 
         return genome
 
-    def get_sensor_values(self, grid):
+    def get_sensor_values(self, board):
         """
         Returns an nxn array of the objects the snake senses around its head (default is 5x5)
         Must be an odd number, if not will -1
@@ -220,7 +220,7 @@ class Snake:
 
         # get head position
         x, y = self.body[-1]
-        assert grid[x][y] == Part.HEAD, grid
+        assert board[x, y] == Part.HEAD, str(board)
 
         assert self.sensor_size % 2 == 1  # size cannot be off
         sensor_values = [[None] * self.sensor_size for i in range(self.sensor_size)]
@@ -252,7 +252,7 @@ class Snake:
                 # if location is out of bounds, then 0
                 sensor_values[i // 5][i % 5] = 0
             else:
-                sensor_values[i // 5][i % 5] = grid[a][b]
+                sensor_values[i // 5][i % 5] = board[a, b]
 
         return sensor_values
 
@@ -327,6 +327,7 @@ if __name__ == "__main__":
     board[0][0] = ":"
     # board[0][1] = ":"
 
+    raise NotImplementedError("This isn't a real board, should pass b instead:")
     sn.get_sensor_values(board)
     # sn.get_random_genome(display=True)
     sn.get_next_movement(board, display=True)

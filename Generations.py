@@ -54,6 +54,7 @@ def Round(
     for turn in range(round_length):
         if len(board.living_snakes()) <= 1:
             break
+        board.set_snake_directions()
         board.tick()
         print(f"--turn {turn}")
 

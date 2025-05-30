@@ -1,4 +1,4 @@
-from Snake import Part
+from Snake import Part, Direction
 import random
 
 
@@ -42,6 +42,19 @@ class Board:
         else:
             self.food_countdown = self.food_delay
             self.random_food()
+
+    def set_snake_directions(self):
+        for snake in self.living_snakes():
+            action = snake.get_next_movement(self)
+            match action:
+                case Direction.LEFT:
+                    snake.facing = snake.facing.left()
+                case Direction.UP: # straight ahead
+                    pass
+                case Direction.RIGHT:
+                    snake.facing = snake.facing.right()
+                case _:
+                    raise ValueError(f"{action} is not an action")
 
     def add_food(self, x, y):
         self[x, y] = Part.FOOD
