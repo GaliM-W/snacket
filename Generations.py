@@ -28,45 +28,42 @@ def Reproduce(parent):
 # create a board and run its lifetime
 # if you don't specify an input population, you must specify a target snake number
 def Round(
-    round_length, board_size=10, snake_population=[], num_snakes=0, display=False
+    round_length, board_size=10, snake_population=None, num_snakes=0, display=False
 ):
 
     print("#### BEGIN ROUND ####")
 
     # create the board and snakes
     board = Board(size=board_size)
-    i = 0
-    if snake_population == []:
-        while i < num_snakes:
-            Snake().add_to_board(board)
-            i += 1
-    else:
-        num_snakes = 0
-        for snake in snake_population:
+    if snake_population is None:
+        for i in range(num_snakes):
+            snake = Snake()
+            snake.random_position(board, reset=False)
             snake.add_to_board(board)
-            num_snakes += 1
+    else:
+        snake_population = list(snake_population)
+        while len(snake_population) < num_snakes:
+            snake_population.append(random.choice(snake_population))
+        for snake in snake_population:
+            snake.random_position(board, reset=False)
+            snake.add_to_board(board)
 
     # run the board lifetime
     turns = 0
-    living_snakes = len(board.snakes)
-    print(f"{living_snakes} living snakes")
-    while turns < round_length and living_snakes > 1:
+    print(f"{len(board.living_snakes())} living snakes")
+    for turn in range(round_length):
+        if len(board.living_snakes()) <= 1:
+            break
         board.tick()
-        # if a snake dies, decrement living_snakes
-        turns += 1
-        print(f"turn {turns}")
+        print(f"--turn {turn}")
 
-    if living_snakes == 1:
-        # select the living snake and return it
-        return board.snakes[0]
-    elif living_snakes == 0:
-        # get the max score of dead snakes and return that snake
-        # in case of ties, choose randomly
-        return board.snakes[1]
-    else:
-        # get the max score of living snakes
-        # in case of ties, choose randomly
-        return board.snakes[2]
+    match board.living_snakes():
+        case []:
+            return max(board.historical_snakes, key=lambda s: s.score + random())
+        case [snake]:
+            return snake
+        case snakes:
+            return max(snakes, key=lambda s: s.score + random())
 
 
 # run a number of rounds. again, you must specify either population OR num_snakes
@@ -74,18 +71,18 @@ def Generation(
     num_rounds,
     round_length,
     board_size=10,
-    snake_population=[],
+    snake_population=None,
     num_snakes=0,
     display=False,
 ):
 
     print("#### BEGIN GENERATION ####")
+
     # tbd: number generations
 
     # run a number of rounds per generation and collect winners
-    i = 0
     winners = []
-    while i < num_rounds:
+    for i in range(num_rounds):
         winsnake = Round(
             round_length,
             board_size=board_size,
@@ -93,7 +90,6 @@ def Generation(
             num_snakes=num_snakes,
         )
         winners.append(winsnake)
-        i += 1
 
     # at this point we need to pick pairs of snakes and reproduce another full generation
     # I'm arbitrarily choosing to have them reproduce with neighbors to the right in the array
@@ -112,23 +108,30 @@ def Epoch(
     num_rounds,
     round_length,
     board_size=10,
-    snake_population=[],
+    snake_population=None,
     num_snakes=0,
     display=False,
 ):
     # run a number of generations, using the output of one gen as the input for the next
 
     print("#### BEGIN EPOCH ####")
-    i = 0
     generation = snake_population
     gen_history = []
-    while i < num_generations:
+    for i in range(num_generations):
         generation = Generation(
-            num_rounds, round_length, board_size, generation, num_snakes
+            num_rounds,
+            round_length,
+            board_size,
+            snake_population=generation,
+            num_snakes=num_snakes,
         )
         gen_history.append(generation)
-        i += 1
     return gen_history
 
 
-Epoch(3, 10, 5, num_snakes=10)
+if __name__ == "__main__":
+    epoch = Epoch(5, 10, 5, num_snakes=10)
+    for i, round in enumerate(epoch):
+        # last round has all zeros as position, because it's freshly born snakes who have not been on a board yet
+        print(f"Round {i}: {round}")
+        print()
