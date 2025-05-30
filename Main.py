@@ -1,7 +1,7 @@
 import unicurses
 
-from Board import Board
-from Snake import Snake, Part, Direction
+from Board import Board, Part, Direction
+from Snake import Snake
 
 from curses import wrapper
 

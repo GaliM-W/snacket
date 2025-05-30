@@ -1,4 +1,3 @@
-from Snake import Part, Direction
 import random
 
 
@@ -49,7 +48,7 @@ class Board:
             match action:
                 case Direction.LEFT:
                     snake.facing = snake.facing.left()
-                case Direction.UP: # straight ahead
+                case Direction.UP:  # straight ahead
                     pass
                 case Direction.RIGHT:
                     snake.facing = snake.facing.right()
@@ -79,3 +78,59 @@ class Board:
 
     def living_snakes(self):
         return [snake for snake in self.snakes if not snake.dead]
+
+
+class Part(Enum):
+    EMPTY = 0
+    HEAD = 1
+    LUMP = 2
+    BODY = 3
+    TAIL = 4
+    WALL = 5
+    FOOD = 6
+
+    def __str__(self):
+        match self:
+            case Part.EMPTY:
+                return " "
+            case Part.HEAD:
+                return "@"
+            case Part.LUMP:
+                return "X"
+            case Part.BODY:
+                return "+"
+            case Part.TAIL:
+                return "."
+            case Part.WALL:
+                return "0"
+            case Part.FOOD:
+                return ":"
+        raise ValueError(f"{self} is not a Part")
+
+
+class Direction(Enum):
+    UP = 0
+    RIGHT = 1
+    DOWN = 2
+    LEFT = 3
+
+    def delta(self):
+        match self:
+            case Direction.UP:  # up
+                return 0, -1
+            case Direction.RIGHT:  # right
+                return 1, 0
+            case Direction.DOWN:  # down
+                return 0, 1
+            case Direction.LEFT:  # left
+                return -1, 0
+        raise ValueError(f"{self} is not a direction")
+
+    def left(self):
+        return Direction((self.value + 3) % 4)
+
+    def backwards(self):
+        return Direction((self.value + 2) % 4)
+
+    def right(self):
+        return Direction((self.value + 1) % 4)

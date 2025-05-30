@@ -1,5 +1,5 @@
-from Board import Board
-from Snake import Snake, Part
+from Board import Board, Part
+from Snake import Snake
 from random import random
 
 

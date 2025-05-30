@@ -1,71 +1,14 @@
+from Board import Part, Direction
 from enum import Enum
 import random
 
 
-class Direction(Enum):
-    UP = 0
-    RIGHT = 1
-    DOWN = 2
-    LEFT = 3
-
-    def delta(self):
-        match self:
-            case Direction.UP:  # up
-                return 0, -1
-            case Direction.RIGHT:  # right
-                return 1, 0
-            case Direction.DOWN:  # down
-                return 0, 1
-            case Direction.LEFT:  # left
-                return -1, 0
-        raise ValueError(f"{self} is not a direction")
-
-    def left(self):
-        return Direction((self.value + 3) % 4)
-
-    def backwards(self):
-        return Direction((self.value + 2) % 4)
-
-    def right(self):
-        return Direction((self.value + 1) % 4)
-
-
-class Part(Enum):
-    EMPTY = 0
-    HEAD = 1
-    LUMP = 2
-    BODY = 3
-    TAIL = 4
-    WALL = 5
-    FOOD = 6
-
-    def __str__(self):
-        match self:
-            case Part.EMPTY:
-                return " "
-            case Part.HEAD:
-                return "@"
-            case Part.LUMP:
-                return "X"
-            case Part.BODY:
-                return "+"
-            case Part.TAIL:
-                return "."
-            case Part.WALL:
-                return "0"
-            case Part.FOOD:
-                return ":"
-        raise ValueError(f"{self} is not a Part")
-
-
 class Snake:
-
     def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5):
         self.facing = facing
         self.dead = False
         self.score = 0  # score is the number of food eaten / nutrients
         if body is None:
-            # [x, y, Part]
             self.body = [(0, 0)]
         else:
             self.body = body
@@ -77,51 +20,6 @@ class Snake:
         if self.dead:
             return f"<Snake score={self.score} (dead) {self.body}>"
         return f"<Snake score={self.score} {self.body}>"
-
-    def get_size(self):
-        return len(self.body)
-
-    def eat_snake(self):
-        """handles score and size increase post-snannibalism"""
-        self.score += 3  # default to increasing by 3 for now
-        self.grow += 1
-
-    def die(self):
-        self.dead = True
-
-    def add_to_board(self, board):
-        board.snakes.append(self)
-        board.historical_snakes.add(self)
-        if not self.body:
-            raise ValueError(f"Snake {self} has no length")
-        if len(self.body) > 1:
-            x, y = self.body[0]
-            board[x, y] = Part.TAIL
-            for x, y in self.body[1:-1]:
-                board[x, y] = Part.BODY
-        x, y = self.body[-1]
-        board[x, y] = Part.HEAD
-
-    def random_position(self, board, reset=False):
-        free = [
-            (i, j)
-            for i, row in enumerate(board.grid)
-            for j, spot in enumerate(row)
-            if spot == Part.EMPTY
-        ]
-        self.grow = 2
-        self.body = [random.choice(free)]
-        self.facing = random.choice(
-            [
-                Direction.UP,
-                Direction.RIGHT,
-                Direction.DOWN,
-                Direction.LEFT,
-            ]
-        )
-        if reset:
-            self.dead = False
-            self.score = 0
 
     def tick(self, board):
         if not self.dead:
@@ -143,6 +41,19 @@ class Snake:
         else:
             tail = self.body.pop(0)
             board[tail] = Part.EMPTY
+
+    def add_to_board(self, board):
+        board.snakes.append(self)
+        board.historical_snakes.add(self)
+        if not self.body:
+            raise ValueError(f"Snake {self} has no length")
+        if len(self.body) > 1:
+            x, y = self.body[0]
+            board[x, y] = Part.TAIL
+            for x, y in self.body[1:-1]:
+                board[x, y] = Part.BODY
+        x, y = self.body[-1]
+        board[x, y] = Part.HEAD
 
     def move_to(self, coordinates, board):
         match board[coordinates]:
@@ -167,6 +78,27 @@ class Snake:
                 pass
             case other:
                 raise ValueError(f"{other} is not a part")
+
+    def random_position(self, board, reset=False):
+        free = [
+            (i, j)
+            for i, row in enumerate(board.grid)
+            for j, spot in enumerate(row)
+            if spot == Part.EMPTY
+        ]
+        self.grow = 2
+        self.body = [random.choice(free)]
+        self.facing = random.choice(
+            [
+                Direction.UP,
+                Direction.RIGHT,
+                Direction.DOWN,
+                Direction.LEFT,
+            ]
+        )
+        if reset:
+            self.dead = False
+            self.score = 0
 
     def get_random_genome(self, display=False):
         """
@@ -308,6 +240,17 @@ class Snake:
 
         # returns the key (direction) with the highest value (sum of weights)
         return max(direction, key=direction.get)
+
+    def get_size(self):
+        return len(self.body)
+
+    def eat_snake(self):
+        """handles score and size increase post-snannibalism"""
+        self.score += 3  # default to increasing by 3 for now
+        self.grow += 1
+
+    def die(self):
+        self.dead = True
 
 
 if __name__ == "__main__":
