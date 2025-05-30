@@ -41,11 +41,12 @@ def Round(
             snake.random_position(board, reset=False)
             snake.add_to_board(board)
     else:
-        num_snakes = 0
+        snake_population = list(snake_population)
+        while len(snake_population) < num_snakes:
+            snake_population.append(random.choice(snake_population))
         for snake in snake_population:
             snake.random_position(board, reset=False)
             snake.add_to_board(board)
-            num_snakes += 1
 
     # run the board lifetime
     turns = 0
@@ -54,7 +55,7 @@ def Round(
         if len(board.living_snakes()) <= 1:
             break
         board.tick()
-        print(f"turn {turn}")
+        print(f"--turn {turn}")
 
     match board.living_snakes():
         case []:
@@ -129,7 +130,8 @@ def Epoch(
 
 
 if __name__ == "__main__":
-    epoch = Epoch(3, 10, 5, num_snakes=10)
+    epoch = Epoch(5, 10, 5, num_snakes=10)
     for i, round in enumerate(epoch):
+        # last round has all zeros as position, because it's freshly born snakes who have not been on a board yet
         print(f"Round {i}: {round}")
         print()
