@@ -50,6 +50,7 @@ class Board:
     def set_snake_directions(self):
         for snake in self.living_snakes():
             action = snake.get_next_movement(self)
+            snake.turns[action] += 1 # record stats about turns
             match action:
                 case Direction.LEFT:
                     snake.facing = snake.facing.left()

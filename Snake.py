@@ -1,34 +1,39 @@
 from Board import Part, Direction
+from collections import defaultdict
 import random
 
 
 class Snake:
     def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5):
         self.facing = facing
-        self.dead = False
-        self.score = 0  # score is the number of food eaten / nutrients
-        self.age = 0
         if body is None:
             self.body = [(0, 0)]
         else:
             self.body = body
         self.sensor_size = sensor_size  # 5x5 sensor by default
+        self.reset()
         self.genome = self.get_random_genome()
         self.grow = 0
 
     def __copy__(self):
         new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size)
+        new.genome = self.genome
+        new.grow = self.grow
         new.dead = self.dead
         new.score = self.score
         new.age = self.age
-        new.genome = self.genome
-        new.grow = self.grow
         return new
+
+    def reset(self):
+        self.dead = False
+        self.score = 0
+        self.age = 0
+        self.turns = defaultdict(int)
 
     def __repr__(self):
         if self.dead:
             return f"<Snake score={self.score} (dead) {self.body}>"
-        return f"<Snake score={self.score} {self.body}>"
+        return f"<Snake score={self.score} {self.body} turns {dict(self.turns)}>"
 
     def tick(self, board):
         if not self.dead:
@@ -112,9 +117,7 @@ class Snake:
             ]
         )
         if reset:
-            self.dead = False
-            self.score = 0
-            self.age = 0
+            self.reset()
 
     def get_random_genome(self, display=False):
         """

@@ -16,7 +16,10 @@ def main(stdscr):
 
     def display(board):
         stdscr.clear()
-        stdscr.addstr(str(board) + "\n")
+        try:
+            stdscr.addstr(str(board) + "\n")
+        except Exception as err:
+            raise ValueError("Board size might be too large for terminal") from err
         try:
             for message in info:
                 stdscr.addstr(message + "\n")
@@ -40,7 +43,7 @@ def main(stdscr):
         size=25,
         food_delay=3,
         initial_growth=3,
-        food_threshold=25,
+        food_threshold=70,
         display=display,
         msg=messages.append,
         info=info.append,
