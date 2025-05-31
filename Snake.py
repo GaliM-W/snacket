@@ -7,6 +7,7 @@ class Snake:
         self.facing = facing
         self.dead = False
         self.score = 0  # score is the number of food eaten / nutrients
+        self.age = 0
         if body is None:
             self.body = [(0, 0)]
         else:
@@ -14,6 +15,15 @@ class Snake:
         self.sensor_size = sensor_size  # 5x5 sensor by default
         self.genome = self.get_random_genome()
         self.grow = 0
+
+    def __copy__(self):
+        new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size)
+        new.dead = self.dead
+        new.score = self.score
+        new.age = self.age
+        new.genome = self.genome
+        new.grow = self.grow
+        return new
 
     def __repr__(self):
         if self.dead:
@@ -23,6 +33,7 @@ class Snake:
     def tick(self, board):
         if not self.dead:
             # move snake head
+            self.age += 1
             delta_x, delta_y = self.facing.delta()
             head_x, head_y = self.body[-1]
             new_coordinate = board.wraparound_pair((head_x + delta_x, head_y + delta_y))
@@ -39,9 +50,14 @@ class Snake:
                 board[neck] = Part.LUMP
         else:
             tail = self.body.pop(0)
+            if len(self.body) > 1:
+                if board[self.body[0]] != Part.LUMP:
+                    board[self.body[0]] = Part.TAIL
+                assert board[tail] in [Part.BODY, Part.TAIL, Part.LUMP]
             board[tail] = Part.EMPTY
 
     def add_to_board(self, board):
+        assert self not in board.snakes
         board.snakes.append(self)
         board.historical_snakes.add(self)
         if not self.body:
@@ -85,7 +101,7 @@ class Snake:
             for j, spot in enumerate(row)
             if spot == Part.EMPTY
         ]
-        self.grow = 2
+        self.grow = board.initial_growth
         self.body = [random.choice(free)]
         self.facing = random.choice(
             [
@@ -98,6 +114,7 @@ class Snake:
         if reset:
             self.dead = False
             self.score = 0
+            self.age = 0
 
     def get_random_genome(self, display=False):
         """
@@ -151,7 +168,9 @@ class Snake:
 
         # get head position
         x, y = self.body[-1]
-        assert board[x, y] == Part.HEAD, str(board)
+        assert (
+            board[x, y] == Part.HEAD
+        ), f"Expected head, got {repr(board[x, y])} at {(x, y)} in:\n{str(board)}\n(snake = {self})"
 
         assert self.sensor_size % 2 == 1  # size cannot be off
         sensor_values = [[None] * self.sensor_size for i in range(self.sensor_size)]

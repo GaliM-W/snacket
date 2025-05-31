@@ -1,6 +1,7 @@
 from Board import Board, Part
 from Snake import Snake
-from random import random
+from random import random, choices
+from copy import copy
 
 
 def MutateGene(gene, mutation_chance=0.1, mutation_range=0.1):
@@ -25,85 +26,123 @@ def Reproduce(parent):
     return child
 
 
+def Fitness(snake):
+    return not snake.dead, snake.score, snake.age, random()
+
+
 # create a board and run its lifetime
 # if you don't specify an input population, you must specify a target snake number
-def Round(round_length, board_size=10, snake_population=None, num_snakes=0):
+def Round(
+    round_length,
+    board_size=10,
+    snake_population=None,
+    num_snakes=0,
+    round_n=0,
+    display=None,
+    msg=None,
+    info=None,
+    **kwargs,
+):
+    if info is None:
+        info = lambda *a, **kw: None
 
-    print("#### BEGIN ROUND ####")
+    info(f"# BEGIN ROUND {round_n} #")
 
     # create the board and snakes
-    board = Board(size=board_size)
-    if snake_population is None:
+    board = Board(**kwargs)
+    if not snake_population:
         for i in range(num_snakes):
             snake = Snake()
-            snake.random_position(board, reset=False)
+            snake.random_position(board, reset=True)
             snake.add_to_board(board)
     else:
         snake_population = list(snake_population)
-        while len(snake_population) < num_snakes:
-            snake_population.append(random.choice(snake_population))
+        snakes_to_add = num_snakes - len(snake_population)
+        weights = range(
+            snakes_to_add + 1, 1, -1
+        )  # favour snakes at start of list, as they tend to have higher fitness
+        new_snakes = choices(snake_population, weights=weights, k=snakes_to_add)
+        snake_population.extend(new_snakes)
         for snake in snake_population:
-            snake.random_position(board, reset=False)
+            snake = copy(snake)
+            snake.random_position(board, reset=True)
             snake.add_to_board(board)
 
     # run the board lifetime
-    turns = 0
-    print(f"{len(board.living_snakes())} living snakes")
+    info(f"{len(board.living_snakes())} living snakes")
     for turn in range(round_length):
+        if display is not None:
+            display(board)
         if len(board.living_snakes()) <= 1:
             break
         board.set_snake_directions()
         board.tick()
-        print(f"--turn {turn}")
+        if info is not None:
+            info(f"--turn {turn}")
+    else:
+        if display is not None:
+            display(board)
 
-    match board.living_snakes():
-        case []:
-            return max(board.historical_snakes, key=lambda s: s.score + random())
-        case [snake]:
-            return snake
-        case snakes:
-            return max(snakes, key=lambda s: s.score + random())
+    # fitness function considers whether snake survived or not,
+    # score, and age, plus a small random factor
+    return max(board.historical_snakes, key=Fitness)
 
 
 # run a number of rounds. again, you must specify either population OR num_snakes
-def Generation(num_rounds, round_length, **kwargs):
-
-    print("#### BEGIN GENERATION ####")
+def Generation(num_rounds, round_length, msg=None, info=None, gen_n=0, **kwargs):
+    if msg is not None:
+        msg(f"## BEGIN GENERATION {gen_n} ##")
 
     # tbd: number generations
 
     # run a number of rounds per generation and collect winners
     winners = []
     for i in range(num_rounds):
-        winsnake = Round(round_length, **kwargs)
+        winsnake = Round(round_length, msg=msg, info=info, round_n=i, **kwargs)
         winners.append(winsnake)
+    for winsnake in winners:
+        if info is not None:
+            alive, score, age, _ = Fitness(winsnake)
+            alive = "LIVE" if alive else "dead"
+            info(f"Winner: {alive=} {score=} {age=}")
 
-    # at this point we need to pick pairs of snakes and reproduce another full generation
-    # I'm arbitrarily choosing to have them reproduce with neighbors to the right in the array
-    # looping around, so final snake reproduces with the first
-    j = 0
-    next_gen = []
-    for j in range(len(winners)):
-        next_gen.append(Reproduce(winners[j]))
-        # next_gen.append(winners[j])
+    winners.sort(key=Fitness)
+
+    next_gen = [Reproduce(winner) for winner in winners]
 
     return next_gen
 
 
-def Epoch(num_generations, num_rounds, round_length, snake_population=(), **kwargs):
+def Epoch(
+    num_generations,
+    num_rounds,
+    round_length,
+    epoch_n=0,
+    snake_population=(),
+    msg=None,
+    **kwargs,
+):
     # run a number of generations, using the output of one gen as the input for the next
 
-    print("#### BEGIN EPOCH ####")
+    if msg is not None:
+        msg(f"### BEGIN EPOCH {epoch_n} ###")
     generation = list(snake_population)
     gen_history = []
     for i in range(num_generations):
-        generation = Generation(num_rounds, round_length, **kwargs)
+        generation = Generation(
+            num_rounds,
+            round_length,
+            gen_n=i,
+            snake_population=generation,
+            msg=msg,
+            **kwargs,
+        )
         gen_history.append(generation)
     return gen_history
 
 
 if __name__ == "__main__":
-    epoch = Epoch(5, 10, 5, num_snakes=10)
+    epoch = Epoch(5, 10, 5, num_snakes=10, display=print)
     for i, round in enumerate(epoch):
         # last round has all zeros as position, because it's freshly born snakes who have not been on a board yet
         print(f"Round {i}: {round}")

@@ -3,7 +3,9 @@ from enum import Enum
 
 
 class Board:
-    def __init__(self, snakes=(), size=10, food_delay=0, food_threshold=0):
+    def __init__(
+        self, snakes=(), size=10, food_delay=0, food_threshold=0, initial_growth=3
+    ):
         self.grid = [[Part.EMPTY] * size for i in range(size)]
         self.size = size
         self.food_delay = food_delay
@@ -11,6 +13,7 @@ class Board:
         self.food_threshold = food_threshold
         self.snakes = []
         self.historical_snakes = set()
+        self.initial_growth = initial_growth
         for snake in snakes:
             snake.add_to_board(self)
 
@@ -35,6 +38,7 @@ class Board:
     def tick(self):
         # delete empty snakes
         self.snakes = [snake for snake in self.snakes if snake.body]
+        assert len(self.snakes) == len(set(self.snakes)), "a single snake mustn't be added twice"
         for snake in self.snakes:
             snake.tick(self)
         if self.food_countdown:
