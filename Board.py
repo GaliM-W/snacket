@@ -4,7 +4,13 @@ from enum import Enum
 
 class Board:
     def __init__(
-        self, snakes=(), size=10, food_delay=0, food_threshold=0, initial_growth=3
+        self,
+        snakes=(),
+        size=10,
+        walls=0,
+        food_delay=0,
+        food_threshold=0,
+        initial_growth=3,
     ):
         self.grid = [[Part.EMPTY] * size for i in range(size)]
         self.size = size
@@ -16,6 +22,7 @@ class Board:
         self.initial_growth = initial_growth
         for snake in snakes:
             snake.add_to_board(self)
+        self.random_walls(walls)
 
     def __str__(self):
         return "\n".join("".join(str(part) for part in row) for row in self.grid)
@@ -38,7 +45,9 @@ class Board:
     def tick(self):
         # delete empty snakes
         self.snakes = [snake for snake in self.snakes if snake.body]
-        assert len(self.snakes) == len(set(self.snakes)), "a single snake mustn't be added twice"
+        assert len(self.snakes) == len(
+            set(self.snakes)
+        ), "a single snake mustn't be added twice"
         for snake in self.snakes:
             snake.tick(self)
         if self.food_countdown:
@@ -50,7 +59,7 @@ class Board:
     def set_snake_directions(self, **kw):
         for snake in self.living_snakes():
             action = snake.get_next_movement(self, **kw)
-            snake.turns[action] += 1 # record stats about turns
+            snake.turns[action] += 1  # record stats about turns
             match action:
                 case Direction.LEFT:
                     snake.facing = snake.facing.left()
@@ -75,6 +84,14 @@ class Board:
             if self[x, y] == Part.EMPTY:
                 self.add_food(x, y)
                 return
+
+    def random_walls(self, number):
+        walls_added = 0
+        while walls_added < number:
+            x, y = random.randrange(self.size), random.randrange(self.size)
+            if self[x, y] == Part.EMPTY:
+                self.add_wall(x, y)
+                walls_added += 1
 
     def snake_at(self, x, y):
         for snake in self.snakes:

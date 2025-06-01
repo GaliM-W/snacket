@@ -40,11 +40,12 @@ def main(stdscr):
         stdscr.refresh()
 
     results = Epoch(
-        500,
+        1000,
         5,
         100,
         num_snakes=10,
         size=25,
+        walls=10,
         food_delay=3,
         initial_growth=3,
         food_threshold=70,
