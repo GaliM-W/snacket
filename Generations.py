@@ -4,24 +4,31 @@ from random import random, choices
 from copy import copy
 
 
-def MutateGene(gene, mutation_chance=0.1, mutation_range=0.1):
-    n = random()
-    if n <= mutation_chance:
-        mutation = ((2 * mutation_range) * (random())) - mutation_range
-        gene += mutation
-    return gene
+def MutateGeneBlock(geneBlock, mutation_chance=0.1, mutation_range=0.1):
+    # We mutate the l,r,u genes for a given modality and cell together
+    # Each gene mutation is random, and then the genes are scaled so that
+    # they still sum to 1
+
+    for gene in geneBlock:
+        n = random()
+        if n <= mutation_chance:
+            mutation = ((2 * mutation_range) * (random())) - mutation_range
+            gene += mutation
+    normalizer = sum(geneBlock)
+    for gene in geneBlock:
+        gene = gene/normalizer
+    return geneBlock
 
 
 def Reproduce(parent):
+    # Create a new snake and give it a mutated version of the parent genome
+
     child = Snake()
     for modality in child.genome.keys():
         for geneSequence in range(len(parent.genome[modality])):
             for geneBlock in range(len(parent.genome[modality][geneSequence])):
-                for gene in range(
-                    len(parent.genome[modality][geneSequence][geneBlock])
-                ):
-                    child.genome[modality][geneSequence][geneBlock][gene] = MutateGene(
-                        parent.genome[modality][geneSequence][geneBlock][gene]
+                child.genome[modality][geneSequence][geneBlock] = MutateGeneBlock(
+                    parent.genome[modality][geneSequence][geneBlock]
                     )
     return child
 
