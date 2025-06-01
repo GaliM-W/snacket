@@ -164,10 +164,12 @@ class Snake:
         Must be an odd number, if not will -1
         It is aligned with the direction of the snake head
         """
-        # wall
-        # other snake
-        # other snake head and direction
-        # food
+
+        def reverse_range(r):
+            return range(r.stop - r.step, r.start - r.step, -r.step)
+
+        def transposed(grid):
+            return [list(row) for row in zip(*grid)]
 
         # get head position
         x, y = self.body[-1]
@@ -179,30 +181,36 @@ class Snake:
         sensor_values = [[None] * self.sensor_size for i in range(self.sensor_size)]
         r = self.sensor_size // 2
 
+        i_range = range(x - r, x + r + 1)
+        j_range = range(y - r, y + r + 1)
+        transpose = False
+
         match self.facing:
             case Direction.UP:
-                # finding indices that surround the head direction
-                i_range = range(x - r, x + r + 1)
-                j_range = range(y - r, y + r + 1)
+                pass
 
             case Direction.RIGHT:
-                i_range = range(y + r, y - r - 1, -1)
-                j_range = range(x - r, x + r + 1)
+                j_range = reverse_range(j_range)
+                transpose = True
 
             case Direction.DOWN:
-                # scan the board in the opposite direction to UP
-                i_range = range(x + r, x - r - 1, -1)
-                j_range = range(y + r, y - r - 1, -1)
+                i_range = reverse_range(i_range)
+                j_range = reverse_range(j_range)
 
             case Direction.LEFT:
-                i_range = range(y - r, y + r + 1)
-                j_range = range(x + r, x - r - 1, -1)
+                i_range = reverse_range(i_range)
+                transpose = True
 
-        locations = [[(i, j) for i in i_range] for j in j_range]
+            case _:
+                raise ValueError(f"{self.facing} is not a valid snake direction")
+
+        locations = [[(i, j) for j in j_range] for i in i_range]
+        if transpose:
+            locations = transposed(locations)
 
         for i in range(self.sensor_size):
             for j in range(self.sensor_size):
-                sensor_values[i][j] = board[i_range[i], j_range[j]]
+                sensor_values[i][j] = board[locations[i][j]]
 
         return sensor_values
 

@@ -125,7 +125,7 @@ class Part(Enum):
             case Part.TAIL:
                 return "."
             case Part.WALL:
-                return "0"
+                return "#"
             case Part.FOOD:
                 return ":"
         raise ValueError(f"{self} is not a Part")
