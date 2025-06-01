@@ -13,9 +13,13 @@ def main(stdscr):
     stdscr.clear()
     messages = []
     info = []
+    last_key = ""
 
     def display(board):
+        nonlocal last_key
         stdscr.clear()
+        if last_key == "e":
+            stdscr.addstr(repr(eval(stdscr.getstr())) + "\n")
         try:
             stdscr.addstr(str(board) + "\n")
         except Exception as err:
@@ -26,10 +30,10 @@ def main(stdscr):
             info.clear()
             for message in messages:
                 stdscr.addstr(message + "\n")
-                stdscr.getch()
+                last_key = stdscr.getkey()
             if not messages:
-                # sleep(0.1)
-                pass
+                if last_key != "n":
+                  last_key = stdscr.getkey()
             messages.clear()
         except Exception as err:
             raise Exception(f"Messages were {messages}, info was {info}, board is {board}") from err

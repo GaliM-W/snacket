@@ -47,9 +47,9 @@ class Board:
             self.food_countdown = self.food_delay
             self.random_food()
 
-    def set_snake_directions(self):
+    def set_snake_directions(self, **kw):
         for snake in self.living_snakes():
-            action = snake.get_next_movement(self)
+            action = snake.get_next_movement(self, **kw)
             snake.turns[action] += 1 # record stats about turns
             match action:
                 case Direction.LEFT:

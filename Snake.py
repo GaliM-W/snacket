@@ -58,7 +58,7 @@ class Snake:
             if len(self.body) > 1:
                 if board[self.body[0]] != Part.LUMP:
                     board[self.body[0]] = Part.TAIL
-                assert board[tail] in [Part.BODY, Part.TAIL, Part.LUMP]
+                # assert board[tail] in [Part.BODY, Part.TAIL, Part.LUMP]
             board[tail] = Part.EMPTY
 
     def add_to_board(self, board):
@@ -130,7 +130,7 @@ class Snake:
         # mapping between each sensory modality and direction
         genome = {}
 
-        sensory_modalities = Part.HEAD, Part.BODY, Part.FOOD, Part.WALL
+        sensory_modalities = Part.HEAD, Part.BODY, Part.FOOD, Part.WALL, Part.EMPTY
         genome = {
             sense: [[None] * self.sensor_size for i in range(self.sensor_size)]
             for sense in sensory_modalities
@@ -171,9 +171,9 @@ class Snake:
 
         # get head position
         x, y = self.body[-1]
-        assert (
-            board[x, y] == Part.HEAD
-        ), f"Expected head, got {repr(board[x, y])} at {(x, y)} in:\n{str(board)}\n(snake = {self})"
+        # assert (
+        #     board[x, y] == Part.HEAD
+        # ), f"Expected head, got {repr(board[x, y])} at {(x, y)} in:\n{str(board)}\n(snake = {self})"
 
         assert self.sensor_size % 2 == 1  # size cannot be off
         sensor_values = [[None] * self.sensor_size for i in range(self.sensor_size)]
@@ -198,18 +198,15 @@ class Snake:
                 i_range = range(y - r, y + r + 1)
                 j_range = range(x + r, x - r - 1, -1)
 
-        locations = [(i, j) for j in i_range for i in j_range]
+        locations = [[(i, j) for i in i_range] for j in j_range]
 
-        for i, (a, b) in enumerate(locations):
-            if a < 0 or a >= self.sensor_size or b < 0 or b >= self.sensor_size:
-                # if location is out of bounds, then 0
-                sensor_values[i // 5][i % 5] = 0
-            else:
-                sensor_values[i // 5][i % 5] = board[a, b]
+        for i in range(self.sensor_size):
+            for j in range(self.sensor_size):
+                sensor_values[i][j] = board[i_range[i], j_range[j]]
 
         return sensor_values
 
-    def get_next_movement(self, board, display=False):
+    def get_next_movement(self, board, display=False, info=None):
         """
         Iterates through the board
         If an item is identfied, then will search its array for the weight
@@ -224,36 +221,23 @@ class Snake:
                 if display:
                     print("obj", obj)
                 match obj:
-                    case Part.EMPTY:
-                        continue
                     case Part.FOOD:
                         l, r, u = self.genome[Part.FOOD][i][j]
-                        if display:
-                            print(l, r, u)
-                        direction[Direction.LEFT] += l
-                        direction[Direction.RIGHT] += r
-                        direction[Direction.UP] += u
                     case Part.BODY | Part.TAIL | Part.LUMP:
                         l, r, u = self.genome[Part.BODY][i][j]
-                        if display:
-                            print(l, r, u)
-                        direction[Direction.LEFT] += l
-                        direction[Direction.RIGHT] += r
-                        direction[Direction.UP] += u
                     case Part.HEAD:
                         l, r, u = self.genome[Part.HEAD][i][j]
-                        if display:
-                            print(l, r, u)
-                        direction[Direction.LEFT] += l
-                        direction[Direction.RIGHT] += r
-                        direction[Direction.UP] += u
                     case Part.WALL:
                         l, r, u = self.genome[Part.WALL][i][j]
-                        if display:
-                            print(l, r, u)
-                        direction[Direction.LEFT] += l
-                        direction[Direction.RIGHT] += r
-                        direction[Direction.UP] += u
+                    case Part.EMPTY:
+                        l, r, u = self.genome[Part.EMPTY][i][j]
+                    case _:
+                        raise ValueError(f"{obj} is not a Part")
+                if display:
+                    print(l, r, u)
+                direction[Direction.LEFT] += l
+                direction[Direction.RIGHT] += r
+                direction[Direction.UP] += u
                 # keep listing elif for other sensory modalities here
         if display:
             print(direction)

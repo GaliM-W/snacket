@@ -12,11 +12,11 @@ def MutateGeneBlock(geneBlock, mutation_chance=0.1, mutation_range=0.1):
     for gene in geneBlock:
         n = random()
         if n <= mutation_chance:
-            mutation = ((2 * mutation_range) * (random())) - mutation_range
+            mutation = (2 * mutation_range) * (random() - 0.5)
             gene += mutation
     normalizer = sum(geneBlock)
     for gene in geneBlock:
-        gene = gene/normalizer
+        gene = gene / normalizer
     return geneBlock
 
 
@@ -28,8 +28,10 @@ def Reproduce(parent):
         for geneSequence in range(len(parent.genome[modality])):
             for geneBlock in range(len(parent.genome[modality][geneSequence])):
                 child.genome[modality][geneSequence][geneBlock] = MutateGeneBlock(
-                    parent.genome[modality][geneSequence][geneBlock]
-                    )
+                    parent.genome[modality][geneSequence][geneBlock],
+                    mutation_chance=0.3,
+                    mutation_range=0.2,
+                )
     return child
 
 
@@ -81,8 +83,10 @@ def Round(
         if display is not None:
             display(board)
         if len(board.living_snakes()) <= 1:
+            if info is not None:
+                info("Round finished early")
             break
-        board.set_snake_directions()
+        board.set_snake_directions(info=info)
         board.tick()
         if info is not None:
             info(f"--turn {turn}")
