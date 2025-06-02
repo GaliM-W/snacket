@@ -2,23 +2,29 @@ from Board import Board, Part, Direction
 from Snake import Snake
 from random import random, choices
 from copy import copy
-
+import math
 
 def MutateGeneBlock(geneBlock, mutation_chance=0.3, mutation_range=0.3):
     # We mutate the l,r,u genes for a given modality and cell together
     # Each gene mutation is random, and then the genes are scaled so that
     # they still sum to 1
-
+    log_genes = []
     for i in range(len(geneBlock)):
+        log_genes.append(math.log(max(geneBlock[i], 1e-10))) # Tried using log space to avoid explosions
+    for i in range(len(log_genes)):
         if random() <= mutation_chance:
             mutation = (2 * mutation_range) * (random() - 0.5)
-            geneBlock[i] += mutation
-    normalizer = sum(geneBlock)
-    for i in range(len(geneBlock)):
-        if (normalizer == 0):
-            print(normalizer, geneBlock)
-        geneBlock[i] = geneBlock[i] / normalizer
-    return geneBlock
+            log_genes[i] += mutation
+
+    genes = [] # then converted it back here
+    for i in range(len(log_genes)):
+        genes.append(math.exp(log_genes[i]))
+
+    normalizer = sum(genes)
+    results = []
+    for gene in genes:
+        results.append(gene / normalizer)
+    return results
 
 
 def Reproduce(parent):
