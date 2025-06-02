@@ -27,8 +27,8 @@ def main(stdscr):
             messages.clear()
             return
         try:
-            for message in info:
-                stdscr.addstr(message + "\n")
+            #for message in info:
+                #stdscr.addstr(message + "\n")
             info.clear()
             for message in messages:
                 stdscr.addstr(message + "\n")

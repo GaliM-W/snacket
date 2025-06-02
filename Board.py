@@ -17,12 +17,16 @@ class Board:
         self.food_delay = food_delay
         self.food_countdown = food_delay
         self.food_threshold = food_threshold
+        #self.perimeter_walls()
         self.snakes = []
         self.historical_snakes = set()
         self.initial_growth = initial_growth
         for snake in snakes:
             snake.add_to_board(self)
-        self.random_walls(walls)
+        #self.random_walls(walls)
+        for i in range(15):
+            self.random_food()
+        self.turn_counter = 0
 
     def __str__(self):
         return "\n".join("".join(str(part) for part in row) for row in self.grid)
@@ -44,6 +48,11 @@ class Board:
 
     def tick(self):
         # delete empty snakes
+        self.turn_counter += 1
+        if (self.turn_counter > 20):
+            self.perimeter_walls()
+            #if (self.turn_counter == 20):
+                #self.random_walls()
         self.snakes = [snake for snake in self.snakes if snake.body]
         assert len(self.snakes) == len(
             set(self.snakes)
@@ -101,6 +110,12 @@ class Board:
 
     def living_snakes(self):
         return [snake for snake in self.snakes if not snake.dead]
+    
+
+    def perimeter_walls(self):
+        for i in range(self.size):
+            self[0, i] = Part.WALL
+            self[i, 0] = Part.WALL
 
 
 class Part(Enum):
