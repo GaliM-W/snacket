@@ -1,4 +1,4 @@
-import unicurses
+# import unicurses
 
 from Board import Board, Part, Direction
 from Snake import Snake
@@ -9,21 +9,23 @@ from time import sleep
 
 results = None
 
+
 def main(stdscr):
     stdscr.clear()
     messages = []
     info = []
     last_key = ""
+    skip = 0
 
     def display(board):
         nonlocal last_key
-        stdscr.clear()
-        if last_key == "e":
-            stdscr.addstr(repr(eval(stdscr.getstr())) + "\n")
-        try:
-            stdscr.addstr(str(board) + "\n")
-        except Exception as err:
-            raise ValueError("Board size might be too large for terminal") from err
+        nonlocal skip
+        if skip:
+            if messages:
+                skip -= 1
+            info.clear()
+            messages.clear()
+            return
         try:
             for message in info:
                 stdscr.addstr(message + "\n")
@@ -33,11 +35,24 @@ def main(stdscr):
                 last_key = stdscr.getkey()
             if not messages:
                 if last_key != "n":
-                  last_key = stdscr.getkey()
+                    last_key = stdscr.getkey()
             messages.clear()
         except Exception as err:
-            raise Exception(f"Messages were {messages}, info was {info}, board is {board}") from err
+            raise Exception(
+                f"Messages were {messages}, info was {info}, board is {board}"
+            ) from err
         stdscr.refresh()
+        stdscr.clear()
+        if last_key == "e":
+            stdscr.addstr(repr(eval(stdscr.getstr())) + "\n")
+            last_key = ""
+        elif last_key == "s":
+            skip = int(stdscr.getstr())
+            last_key = ""
+        try:
+            stdscr.addstr(str(board) + "\n")
+        except Exception as err:
+            raise ValueError("Board size might be too large for terminal") from err
 
     results = Epoch(
         1000,

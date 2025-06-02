@@ -29,8 +29,8 @@ def Reproduce(parent):
             for geneBlock in range(len(parent.genome[modality][geneSequence])):
                 child.genome[modality][geneSequence][geneBlock] = MutateGeneBlock(
                     parent.genome[modality][geneSequence][geneBlock],
-                    mutation_chance=0.3,
-                    mutation_range=0.2,
+                    # mutation_chance=0.3,
+                    # mutation_range=0.2,
                 )
     return child
 
@@ -86,7 +86,7 @@ def Round(
             if info is not None:
                 info("Round finished early")
             break
-        board.set_snake_directions(info=info)
+        board.set_snake_directions(info=info, msg=msg)
         board.tick()
         if info is not None:
             info(f"--turn {turn}")

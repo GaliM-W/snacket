@@ -214,7 +214,7 @@ class Snake:
 
         return sensor_values
 
-    def get_next_movement(self, board, display=False, info=None):
+    def get_next_movement(self, board, msg=None, info=None):
         """
         Iterates through the board
         If an item is identfied, then will search its array for the weight
@@ -223,10 +223,11 @@ class Snake:
         """
         sensor_values = self.get_sensor_values(board)
         direction = {Direction.LEFT: 0, Direction.RIGHT: 0, Direction.UP: 0}
+        extra_display = False
         for i in range(self.sensor_size):
             for j in range(self.sensor_size):
                 obj = sensor_values[i][j]
-                if display:
+                if msg and extra_display:
                     print("obj", obj)
                 match obj:
                     case Part.FOOD:
@@ -237,17 +238,21 @@ class Snake:
                         l, r, u = self.genome[Part.HEAD][i][j]
                     case Part.WALL:
                         l, r, u = self.genome[Part.WALL][i][j]
+                        # if i == 2 and j == 1:
+                        #     info("About to hit a wall")
+                        #     l += 10
+                        #     r += 10
                     case Part.EMPTY:
                         l, r, u = self.genome[Part.EMPTY][i][j]
                     case _:
                         raise ValueError(f"{obj} is not a Part")
-                if display:
+                if msg and extra_display:
                     print(l, r, u)
                 direction[Direction.LEFT] += l
                 direction[Direction.RIGHT] += r
                 direction[Direction.UP] += u
                 # keep listing elif for other sensory modalities here
-        if display:
+        if msg and extra_display:
             print(direction)
             print(max(direction, key=direction.get))
 
