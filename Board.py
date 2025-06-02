@@ -67,7 +67,7 @@ class Board:
 
     def set_snake_directions(self, **kw):
         for snake in self.living_snakes():
-            action = snake.get_next_movement(self, **kw)
+            action = snake.get_next_movement(self, weighted_chance=False, **kw)
             snake.turns[action] += 1  # record stats about turns
             match action:
                 case Direction.LEFT:

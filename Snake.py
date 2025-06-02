@@ -223,7 +223,7 @@ class Snake:
 
         return sensor_values
 
-    def get_next_movement(self, board, msg=None, info=None):
+    def get_next_movement(self, board, msg=None, info=None, weighted_chance=False):
         """
         Iterates through the board
         If an item is identfied, then will search its array for the weight
@@ -264,6 +264,11 @@ class Snake:
         if msg and extra_display:
             print(direction)
             print(max(direction, key=direction.get))
+        
+        if weighted_chance:
+            directions = list(direction.keys())
+            weights = list(direction.values())
+            return random.choices(directions, weights, k=1)[0]
 
         # returns the key (direction) with the highest value (sum of weights)
         return max(direction, key=direction.get)
