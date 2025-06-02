@@ -2,6 +2,8 @@ from Board import Part, Direction
 from collections import defaultdict
 import random
 
+SIZE_THRESHOLD = -2
+
 class Snake:
     def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5, hunger_threshold=10):
         self.facing = facing
@@ -88,7 +90,7 @@ class Snake:
                 size_difference = self.get_size() - hit_snake.get_size()
                 if self == hit_snake:
                     self.die()
-                elif size_difference >= 3:  # 3 is arbitrary threshold for now
+                elif size_difference >= SIZE_THRESHOLD:  # 3 is arbitrary threshold for now
                     # attacker self is larger by at least 3, it eats hit_snake
                     hit_snake.die()  # TODO: this should only take effect after all snakes have moved
                     self.eat_snake()

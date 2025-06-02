@@ -36,7 +36,7 @@ def Reproduce(parent):
 
 
 def Fitness(snake):
-    return not snake.dead, snake.score, snake.age, random()
+    return not snake.dead, snake.snakes_eaten, snake.score, snake.age, random()
 
 
 # create a board and run its lifetime
@@ -113,14 +113,14 @@ def Generation(num_rounds, round_length, msg=None, info=None, gen_n=0, **kwargs)
         winners.append(winsnake)
     for winsnake in winners:
         if info is not None:
-            alive, score, age, _ = Fitness(winsnake)
+            alive, kills, score, age, _ = Fitness(winsnake)
             alive = "LIVE" if alive else "dead"
             turns = (
                 winsnake.turns[Direction.LEFT],
                 winsnake.turns[Direction.UP],
                 winsnake.turns[Direction.RIGHT],
             )
-            info(f"Winner: {alive=} {score=} {age=} {turns=}")
+            info(f"Winner: {alive=} {kills=} {score=} {age=} {turns=}")
 
     winners.sort(key=Fitness)
 
