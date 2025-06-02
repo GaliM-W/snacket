@@ -23,7 +23,7 @@ class Board:
         self.initial_growth = initial_growth
         for snake in snakes:
             snake.add_to_board(self)
-        #self.random_walls(walls)
+        self.random_walls(walls)
         for i in range(food_threshold):
             self.random_food()
         self.turn_counter = 0
