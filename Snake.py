@@ -5,7 +5,7 @@ import random
 SIZE_THRESHOLD = -2
 
 class Snake:
-    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5, hunger_threshold=70):
+    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5, hunger_threshold=20):
         self.facing = facing
         if body is None:
             self.body = [(0, 0)]

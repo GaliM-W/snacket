@@ -4,7 +4,7 @@ from random import random, choices
 from copy import copy
 
 
-def MutateGeneBlock(geneBlock, mutation_chance=0.5, mutation_range=0.6):
+def MutateGeneBlock(geneBlock, mutation_chance=0.3, mutation_range=0.7):
     # We mutate the l,r,u genes for a given modality and cell together
     # Each gene mutation is random, and then the genes are scaled so that
     # they still sum to 1
@@ -15,8 +15,8 @@ def MutateGeneBlock(geneBlock, mutation_chance=0.5, mutation_range=0.6):
             mutation = (2 * mutation_range) * (random() - 0.5)
             gene += mutation
     normalizer = sum(geneBlock)
-    for gene in geneBlock:
-        gene = gene / normalizer
+    for i in range(len(geneBlock)):
+        geneBlock[i] = geneBlock[i] / normalizer
     return geneBlock
 
 
