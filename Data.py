@@ -23,14 +23,15 @@ def then(f1, f2):
 
 
 INDEPENDENT_VARIABLES = {
-    "walls": range(1, 500, 20),
-    "food_threshold": (1, 150, 300),
-    "size": (10, 20, 30),
+    # "walls": range(1, 500, 20),
+    "food_threshold": (0, 100, 200),
+    "size": (15, 25, 35),
 
 }
 
 DEPENDENT_VARIABLES = {
     "avg_score": then(all_snakes(lambda snake: snake.score), mean),
+    "avg_kills": then(all_snakes(lambda snake: snake.snakes_eaten), mean),
     "left": then(all_snakes(lambda snake: snake.turns[Direction.LEFT]), sum),
     "right": then(all_snakes(lambda snake: snake.turns[Direction.RIGHT]), sum),
     "straight": then(all_snakes(lambda snake: snake.turns[Direction.UP]), sum),
@@ -53,7 +54,7 @@ def run_trials(independent_variables, dependent_variables):
             50,
             num_snakes=10,
             size=trial["size"],
-            walls=trial["walls"],
+            walls=0,#trial["walls"],
             food_delay=100,
             initial_growth=3,
             food_threshold=trial["food_threshold"],
