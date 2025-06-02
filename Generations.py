@@ -9,11 +9,10 @@ def MutateGeneBlock(geneBlock, mutation_chance=0.3, mutation_range=0.7):
     # Each gene mutation is random, and then the genes are scaled so that
     # they still sum to 1
 
-    for gene in geneBlock:
-        n = random()
-        if n <= mutation_chance:
+    for i in range(len(geneBlock)):
+        if random() <= mutation_chance:
             mutation = (2 * mutation_range) * (random() - 0.5)
-            gene += mutation
+            geneBlock[i] += mutation
     normalizer = sum(geneBlock)
     for i in range(len(geneBlock)):
         geneBlock[i] = geneBlock[i] / normalizer
