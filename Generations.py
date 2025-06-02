@@ -43,6 +43,7 @@ def Reproduce(parent):
 
 
 def Fitness(snake):
+    # make sure this order matches the logging too
     return not snake.dead, snake.snakes_eaten, snake.score, snake.age, random()
 
 

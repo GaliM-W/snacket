@@ -225,7 +225,11 @@ class Snake:
 
         for i in range(self.sensor_size):
             for j in range(self.sensor_size):
-                sensor_values[i][j] = board[locations[i][j]]
+                loc = locations[i][j]
+                if loc in self.body:
+                    sensor_values[i][j] = Part.HEAD
+                else:
+                    sensor_values[i][j] = board[loc]
 
         return sensor_values
 
