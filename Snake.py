@@ -2,28 +2,29 @@ from Board import Part, Direction
 from collections import defaultdict
 import random
 
+SIZE_THRESHOLD = -2
+
 class Snake:
-    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5):
+    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5, hunger_threshold=70):
         self.facing = facing
         if body is None:
             self.body = [(0, 0)]
         else:
             self.body = body
         self.sensor_size = sensor_size  # 5x5 sensor by default
+        self.hunger_threshold = hunger_threshold
         self.reset()
         self.genome = self.get_random_genome()
         self.grow = 0
-        self.last_eaten = 0
-        self.hunger_threshold = 20
-        self.snakes_eaten = 0
-    
     def __copy__(self):
-        new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size)
+        new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size, hunger_threshold=self.hunger_threshold)
         new.genome = self.genome
         new.grow = self.grow
         new.dead = self.dead
         new.score = self.score
         new.age = self.age
+        new.last_eaten = self.last_eaten
+        new.snakes_eaten = self.snakes_eaten
         return new
 
     def reset(self):
@@ -31,6 +32,8 @@ class Snake:
         self.score = 0
         self.age = 0
         self.turns = defaultdict(int)
+        self.last_eaten = 0
+        self.snakes_eaten = 0
 
     def __repr__(self):
         if self.dead:
@@ -86,7 +89,7 @@ class Snake:
                 size_difference = self.get_size() - hit_snake.get_size()
                 if self == hit_snake:
                     self.die()
-                elif size_difference >= -1:  # 3 is arbitrary threshold for now
+                elif size_difference >= SIZE_THRESHOLD:  # 3 is arbitrary threshold for now
                     # attacker self is larger by at least 3, it eats hit_snake
                     hit_snake.die()  # TODO: this should only take effect after all snakes have moved
                     self.eat_snake()
@@ -219,7 +222,7 @@ class Snake:
 
         return sensor_values
 
-    def get_next_movement(self, board, msg=None, info=None):
+    def get_next_movement(self, board, msg=None, info=None, weighted_chance=False):
         """
         Iterates through the board
         If an item is identfied, then will search its array for the weight
@@ -260,6 +263,11 @@ class Snake:
         if msg and extra_display:
             print(direction)
             print(max(direction, key=direction.get))
+        
+        if weighted_chance:
+            directions = list(direction.keys())
+            weights = list(direction.values())
+            return random.choices(directions, weights, k=1)[0]
 
         # returns the key (direction) with the highest value (sum of weights)
         return max(direction, key=direction.get)
