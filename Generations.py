@@ -88,8 +88,8 @@ def Round(
             break
         board.set_snake_directions(info=info, msg=msg)
         board.tick()
-        if info is not None:
-            info(f"--turn {turn}")
+        # if info is not None:
+        #     info(f"--turn {turn}")
     else:
         if display is not None:
             display(board)
