@@ -119,7 +119,7 @@ class Snake:
             (i, j)
             for i, row in enumerate(board.grid)
             for j, spot in enumerate(row)
-            if spot == Part.EMPTY
+            if spot in (Part.EMPTY, Part.FOOD)
         ]
         self.grow = board.initial_growth
         self.body = [random.choice(free)]
