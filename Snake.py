@@ -14,7 +14,7 @@ class Snake:
         self.genome = self.get_random_genome()
         self.grow = 0
         self.last_eaten = 0
-        self.hunger_threshold = 10
+        self.hunger_threshold = 20
 
     def __copy__(self):
         new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size)
@@ -85,7 +85,7 @@ class Snake:
                 size_difference = self.get_size() - hit_snake.get_size()
                 if self == hit_snake:
                     self.die()
-                elif size_difference >= 3:  # 3 is arbitrary threshold for now
+                elif size_difference >= -1:  # 3 is arbitrary threshold for now
                     # attacker self is larger by at least 3, it eats hit_snake
                     hit_snake.die()  # TODO: this should only take effect after all snakes have moved
                     self.eat_snake()

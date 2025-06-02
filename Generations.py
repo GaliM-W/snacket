@@ -113,7 +113,7 @@ def Generation(num_rounds, round_length, msg=None, info=None, gen_n=0, **kwargs)
         winners.append(winsnake)
     for winsnake in winners:
         if info is not None:
-            alive, score, age, _ = Fitness(winsnake)
+            score, alive, age, _ = Fitness(winsnake)
             alive = "LIVE" if alive else "dead"
             turns = (
                 winsnake.turns[Direction.LEFT],

@@ -24,7 +24,7 @@ class Board:
         for snake in snakes:
             snake.add_to_board(self)
         #self.random_walls(walls)
-        for i in range(15):
+        for i in range(30):
             self.random_food()
         self.turn_counter = 0
 
@@ -49,7 +49,7 @@ class Board:
     def tick(self):
         # delete empty snakes
         self.turn_counter += 1
-        if (self.turn_counter > 20):
+        if (self.turn_counter == 20):
             self.perimeter_walls()
             #if (self.turn_counter == 20):
                 #self.random_walls()
