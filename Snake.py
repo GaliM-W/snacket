@@ -3,27 +3,27 @@ from collections import defaultdict
 import random
 
 class Snake:
-    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5):
+    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5, hunger_threshold=10):
         self.facing = facing
         if body is None:
             self.body = [(0, 0)]
         else:
             self.body = body
         self.sensor_size = sensor_size  # 5x5 sensor by default
+        self.hunger_threshold = hunger_threshold
         self.reset()
         self.genome = self.get_random_genome()
         self.grow = 0
-        self.last_eaten = 0
-        self.hunger_threshold = 10
-        self.snakes_eaten = 0;
 
     def __copy__(self):
-        new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size)
+        new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size, hunger_threshold=self.hunger_threshold)
         new.genome = self.genome
         new.grow = self.grow
         new.dead = self.dead
         new.score = self.score
         new.age = self.age
+        new.last_eaten = self.last_eaten
+        new.snakes_eaten = self.snakes_eaten
         return new
 
     def reset(self):
@@ -31,6 +31,8 @@ class Snake:
         self.score = 0
         self.age = 0
         self.turns = defaultdict(int)
+        self.last_eaten = 0
+        self.snakes_eaten = 0
 
     def __repr__(self):
         if self.dead:
