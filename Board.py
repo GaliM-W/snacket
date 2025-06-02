@@ -17,13 +17,13 @@ class Board:
         self.food_delay = food_delay
         self.food_countdown = food_delay
         self.food_threshold = food_threshold
-        #self.perimeter_walls()
+        self.perimeter_walls()
         self.snakes = []
         self.historical_snakes = set()
         self.initial_growth = initial_growth
         for snake in snakes:
             snake.add_to_board(self)
-        self.random_walls(walls)
+        # self.random_walls(walls)
         for i in range(food_threshold):
             self.random_food()
         self.turn_counter = 0
@@ -115,7 +115,9 @@ class Board:
     def perimeter_walls(self):
         for i in range(self.size):
             self[0, i] = Part.WALL
+            self[self.size-1, i] = Part.WALL
             self[i, 0] = Part.WALL
+            self[i, self.size-1] = Part.WALL
 
 
 class Part(Enum):
