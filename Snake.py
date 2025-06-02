@@ -1,11 +1,12 @@
 from Board import Part, Direction
+
 from collections import defaultdict
 import random
 
 SIZE_THRESHOLD = 3
 
 class Snake:
-    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5, hunger_threshold=70):
+    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=3, hunger_threshold=20):
         self.facing = facing
         if body is None:
             self.body = [(0, 0)]
@@ -16,6 +17,7 @@ class Snake:
         self.reset()
         self.genome = self.get_random_genome()
         self.grow = 0
+        self.fitness = 0
     def __copy__(self):
         new = Snake(
             body=self.body,
@@ -30,6 +32,7 @@ class Snake:
         new.age = self.age
         new.last_eaten = self.last_eaten
         new.snakes_eaten = self.snakes_eaten
+        new.fitness = self.fitness
         return new
 
     def reset(self):
@@ -39,6 +42,7 @@ class Snake:
         self.turns = defaultdict(int)
         self.last_eaten = 0
         self.snakes_eaten = 0
+        self.fitness = 0
 
     def __repr__(self):
         if self.dead:
@@ -49,6 +53,9 @@ class Snake:
         if self.age - self.last_eaten > self.hunger_threshold:
             self.die()
         if not self.dead:
+            # evaluate fitness each tick?
+            from Generations import Fitness
+            self.fitness = Fitness(self)
             # move snake head
             self.age += 1
             delta_x, delta_y = self.facing.delta()

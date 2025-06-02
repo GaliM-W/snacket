@@ -58,6 +58,7 @@ def Round(
     display=None,
     msg=None,
     info=None,
+    get_all_snakes=False,
     **kwargs,
 ):
     if info is None:
@@ -104,11 +105,14 @@ def Round(
 
     # fitness function considers whether snake survived or not,
     # score, and age, plus a small random factor
-    return max(board.historical_snakes, key=Fitness)
+    if not get_all_snakes:
+        return max(board.historical_snakes, key=Fitness)
+    else:
+        return max(board.historical_snakes, key=Fitness), board.historical_snakes
 
 
 # run a number of rounds. again, you must specify either population OR num_snakes
-def Generation(num_rounds, round_length, msg=None, info=None, gen_n=0, **kwargs):
+def Generation(num_rounds, round_length, msg=None, info=None, gen_n=0, get_all_snakes=False, **kwargs):
     if msg is not None:
         msg(f"## BEGIN GENERATION {gen_n} ##")
 
@@ -117,7 +121,7 @@ def Generation(num_rounds, round_length, msg=None, info=None, gen_n=0, **kwargs)
     # run a number of rounds per generation and collect winners
     winners = []
     for i in range(num_rounds):
-        winsnake = Round(round_length, msg=msg, info=info, round_n=i, **kwargs)
+        winsnake, all_snakes = Round(round_length, msg=msg, info=info, round_n=i, get_all_snakes=get_all_snakes, **kwargs)
         winners.append(winsnake)
     for winsnake in winners:
         if info is not None:
@@ -134,7 +138,10 @@ def Generation(num_rounds, round_length, msg=None, info=None, gen_n=0, **kwargs)
 
     next_gen = [Reproduce(winner) for winner in winners]
 
-    return next_gen, winners
+    if not get_all_snakes:
+        return next_gen, winners
+    else:
+        return next_gen, winners, all_snakes
 
 
 def Epoch(
@@ -152,17 +159,21 @@ def Epoch(
         msg(f"### BEGIN EPOCH {epoch_n} ###")
     generation = list(snake_population)
     gen_history = []
+    win_history = []
+    
     for i in range(num_generations):
-        generation, winners = Generation(
+        generation, winners, all_snakes = Generation(
             num_rounds,
             round_length,
             gen_n=i,
             snake_population=generation,
             msg=msg,
+            get_all_snakes=True,
             **kwargs,
         )
-        gen_history.append(winners)
-    return gen_history
+        gen_history.append(all_snakes)
+        win_history.append(winners)
+    return win_history, gen_history
 
 
 if __name__ == "__main__":
