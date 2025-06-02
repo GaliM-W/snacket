@@ -155,13 +155,13 @@ class Direction(Enum):
     def delta(self):
         match self:
             case Direction.UP:  # up
-                return 0, -1
-            case Direction.RIGHT:  # right
-                return 1, 0
-            case Direction.DOWN:  # down
-                return 0, 1
-            case Direction.LEFT:  # left
                 return -1, 0
+            case Direction.RIGHT:  # right
+                return 0, 1
+            case Direction.DOWN:  # down
+                return 1, 0
+            case Direction.LEFT:  # left
+                return 0, -1
         raise ValueError(f"{self} is not a direction")
 
     def left(self):
