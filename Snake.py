@@ -5,7 +5,7 @@ import random
 SIZE_THRESHOLD = 3
 
 class Snake:
-    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=3, hunger_threshold=70):
+    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5, hunger_threshold=70):
         self.facing = facing
         if body is None:
             self.body = [(0, 0)]
@@ -17,7 +17,12 @@ class Snake:
         self.genome = self.get_random_genome()
         self.grow = 0
     def __copy__(self):
-        new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size, hunger_threshold=self.hunger_threshold)
+        new = Snake(
+            body=self.body,
+            facing=self.facing,
+            sensor_size=self.sensor_size,
+            hunger_threshold=self.hunger_threshold,
+        )
         new.genome = self.genome
         new.grow = self.grow
         new.dead = self.dead
@@ -89,7 +94,9 @@ class Snake:
                 size_difference = self.get_size() - hit_snake.get_size()
                 if self == hit_snake:
                     self.die()
-                elif size_difference >= SIZE_THRESHOLD:  # 3 is arbitrary threshold for now
+                elif (
+                    size_difference >= SIZE_THRESHOLD
+                ):  # 3 is arbitrary threshold for now
                     # attacker self is larger by at least 3, it eats hit_snake
                     hit_snake.die()  # TODO: this should only take effect after all snakes have moved
                     self.eat_snake()
@@ -263,10 +270,10 @@ class Snake:
         if msg and extra_display:
             print(direction)
             print(max(direction, key=direction.get))
-        
+
         if weighted_chance:
             directions = list(direction.keys())
-            weights = list(direction.values())
+            weights = [2 ** probability for probability in direction.values()]
             return random.choices(directions, weights, k=1)[0]
 
         # returns the key (direction) with the highest value (sum of weights)
