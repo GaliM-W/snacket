@@ -4,7 +4,7 @@ from random import random, choices
 from copy import copy
 
 
-def MutateGeneBlock(geneBlock, mutation_chance=0.3, mutation_range=0.7):
+def MutateGeneBlock(geneBlock, mutation_chance=0.3, mutation_range=0.3):
     # We mutate the l,r,u genes for a given modality and cell together
     # Each gene mutation is random, and then the genes are scaled so that
     # they still sum to 1
@@ -15,6 +15,8 @@ def MutateGeneBlock(geneBlock, mutation_chance=0.3, mutation_range=0.7):
             geneBlock[i] += mutation
     normalizer = sum(geneBlock)
     for i in range(len(geneBlock)):
+        if (normalizer == 0):
+            print(normalizer, geneBlock)
         geneBlock[i] = geneBlock[i] / normalizer
     return geneBlock
 
@@ -125,7 +127,7 @@ def Generation(num_rounds, round_length, msg=None, info=None, gen_n=0, **kwargs)
 
     next_gen = [Reproduce(winner) for winner in winners]
 
-    return next_gen
+    return next_gen, winners
 
 
 def Epoch(
@@ -144,7 +146,7 @@ def Epoch(
     generation = list(snake_population)
     gen_history = []
     for i in range(num_generations):
-        generation = Generation(
+        generation, winners = Generation(
             num_rounds,
             round_length,
             gen_n=i,
@@ -152,7 +154,7 @@ def Epoch(
             msg=msg,
             **kwargs,
         )
-        gen_history.append(generation)
+        gen_history.append(winners)
     return gen_history
 
 

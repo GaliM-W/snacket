@@ -2,10 +2,10 @@ from Board import Part, Direction
 from collections import defaultdict
 import random
 
-SIZE_THRESHOLD = -2
+SIZE_THRESHOLD = 3
 
 class Snake:
-    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5, hunger_threshold=20):
+    def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=3, hunger_threshold=70):
         self.facing = facing
         if body is None:
             self.body = [(0, 0)]
