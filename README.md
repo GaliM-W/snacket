@@ -29,4 +29,7 @@ Plots the top 5 snakes from each Generation over 1000 generations
 
 # Food sensors
 The lighter the colour, the higher the weight. Map from 0 (dark purple) to 1.0 (light yellow)
-![food_sensors_5000](https://github.com/user-attachments/assets/a8761e0f-358f-4ab6-8631-323b245ecace)
+* 3x3 sensor
+* Head is in the middle (1,1) and the snake is facing North  :arrow_up:
+![SMARTSNAKE](https://github.com/user-attachments/assets/73a724ab-67e3-4dc0-8ea2-9fbfb1e4eae4)
+
