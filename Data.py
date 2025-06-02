@@ -17,16 +17,19 @@ def all_snakes(func):
 
     return inner
 
+
 def then(f1, f2):
     return lambda history: f2(f1(history))
 
 
-DEPENDENT_VARIABLES = {
-    "walls": range(1, 500, 3),
+INDEPENDENT_VARIABLES = {
+    "walls": range(1, 500, 20),
     "food_threshold": (1, 150, 300),
+    "size": (10, 20, 30),
+
 }
 
-INDEPENDENT_VARIABLES = {
+DEPENDENT_VARIABLES = {
     "avg_score": then(all_snakes(lambda snake: snake.score), mean),
     "left": then(all_snakes(lambda snake: snake.turns[Direction.LEFT]), sum),
     "right": then(all_snakes(lambda snake: snake.turns[Direction.RIGHT]), sum),
@@ -34,43 +37,44 @@ INDEPENDENT_VARIABLES = {
 }
 
 
-def run_trials(dependent_variables, independent_variables):
+
+def run_trials(independent_variables, dependent_variables):
     assignments = (
         [(key, value) for value in values]
-        for key, values in dependent_variables.items()
+        for key, values in independent_variables.items()
     )
 
     trials = product(*assignments)
     for trial in trials:
         trial = make_trial(trial)
         history = Epoch(
-            10,
-            5,
             100,
+            5,
+            50,
             num_snakes=10,
-            size=25,
+            size=trial["size"],
             walls=trial["walls"],
             food_delay=100,
             initial_growth=3,
             food_threshold=trial["food_threshold"],
-            display=lambda _: None,
+            display=None,
         )
-        results = {var: func(history) for var, func in independent_variables.items()}
+        results = {var: func(history) for var, func in dependent_variables.items()}
         datum = trial | results
         yield datum
 
 
-def write(dependent_variables, independent_variables, path="./data.json"):
-    data = list(run_trials(dependent_variables, independent_variables))
+def write(independent_variables, dependent_variables, path="./data.json"):
+    data = list(run_trials(independent_variables, dependent_variables))
     with open(path, "w") as f:
         dump(data, f)
     return path
 
 
 def display():
-    for datum in run_trials(DEPENDENT_VARIABLES, INDEPENDENT_VARIABLES):
+    for datum in run_trials(INDEPENDENT_VARIABLES, DEPENDENT_VARIABLES):
         print(datum)
 
 
 if __name__ == "__main__":
-    write(DEPENDENT_VARIABLES, INDEPENDENT_VARIABLES, path="./data.json")
+    write(INDEPENDENT_VARIABLES, DEPENDENT_VARIABLES, path="./data.json")

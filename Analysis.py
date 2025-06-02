@@ -17,12 +17,12 @@ data = data.with_columns(
     right_prop=pl.col("right") / pl.col("total"),
 )
 
-# (
-#     ggplot(data)
-#     + geom_point(aes(x="walls", y="avg_score", colour="food_threshold"))
-#     + scale_colour_discrete() # discrete rather than continuous colour palette
-#     + labs(title="Average score by amount of walls")
-# ).show()
+(
+    ggplot(data)
+    + geom_point(aes(x="walls", y="avg_score", colour="food_threshold"))
+    + scale_colour_discrete() # discrete rather than continuous colour palette
+    + labs(title="Average score by amount of walls")
+).show()
 
 # + geom_line() adds a line graph (+ geom_point() adds a scatterplot)
 # anything that depends on data goes in aes(), e.g. x and y come from dataframe cols
