@@ -14,6 +14,7 @@ class Snake:
         self.reset()
         self.genome = self.get_random_genome()
         self.grow = 0
+        self.snakes_eaten = 0;
 
     def __copy__(self):
         new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size)
@@ -266,6 +267,7 @@ class Snake:
         """handles score and size increase post-snannibalism"""
         self.score += 3  # default to increasing by 3 for now
         self.grow += 1
+        self.snakes_eaten += 1
 
     def die(self):
         self.dead = True
