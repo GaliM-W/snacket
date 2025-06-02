@@ -4,7 +4,7 @@ from random import random, choices
 from copy import copy
 
 
-def MutateGeneBlock(geneBlock, mutation_chance=0.1, mutation_range=0.1):
+def MutateGeneBlock(geneBlock, mutation_chance=0.5, mutation_range=0.6):
     # We mutate the l,r,u genes for a given modality and cell together
     # Each gene mutation is random, and then the genes are scaled so that
     # they still sum to 1
@@ -88,8 +88,8 @@ def Round(
             break
         board.set_snake_directions(info=info, msg=msg)
         board.tick()
-        if info is not None:
-            info(f"--turn {turn}")
+        # if info is not None:
+        #     info(f"--turn {turn}")
     else:
         if display is not None:
             display(board)

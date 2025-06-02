@@ -15,7 +15,8 @@ class Snake:
         self.grow = 0
         self.last_eaten = 0
         self.hunger_threshold = 20
-
+        self.snakes_eaten = 0
+    
     def __copy__(self):
         new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size)
         new.genome = self.genome
@@ -271,6 +272,7 @@ class Snake:
         self.score += 3  # default to increasing by 3 for now
         self.grow += 1
         self.last_eaten = self.age
+        self.snakes_eaten += 1
 
     def die(self):
         self.dead = True

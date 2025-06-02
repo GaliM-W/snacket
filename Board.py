@@ -49,10 +49,9 @@ class Board:
     def tick(self):
         # delete empty snakes
         self.turn_counter += 1
-        if (self.turn_counter == 20):
-            self.perimeter_walls()
-            #if (self.turn_counter == 20):
-                #self.random_walls()
+        #if (self.turn_counter == 20):
+            #self.perimeter_walls()
+            #self.random_walls()
         self.snakes = [snake for snake in self.snakes if snake.body]
         assert len(self.snakes) == len(
             set(self.snakes)
