@@ -2,7 +2,6 @@ from Board import Part, Direction
 from collections import defaultdict
 import random
 
-
 class Snake:
     def __init__(self, body=None, facing=Direction.RIGHT, sensor_size=5):
         self.facing = facing
@@ -14,6 +13,8 @@ class Snake:
         self.reset()
         self.genome = self.get_random_genome()
         self.grow = 0
+        self.last_eaten = 0
+        self.hunger_threshold = 10
 
     def __copy__(self):
         new = Snake(body=self.body, facing=self.facing, sensor_size=self.sensor_size)
@@ -36,6 +37,8 @@ class Snake:
         return f"<Snake score={self.score} {self.body} turns {dict(self.turns)}>"
 
     def tick(self, board):
+        if self.age - self.last_eaten > self.hunger_threshold:
+            self.die()
         if not self.dead:
             # move snake head
             self.age += 1
@@ -94,6 +97,7 @@ class Snake:
             case Part.FOOD:
                 self.score += 1
                 self.grow += 1
+                self.last_eaten = self.age
             case Part.EMPTY:
                 pass
             case other:
@@ -261,6 +265,7 @@ class Snake:
         """handles score and size increase post-snannibalism"""
         self.score += 3  # default to increasing by 3 for now
         self.grow += 1
+        self.last_eaten = self.age
 
     def die(self):
         self.dead = True

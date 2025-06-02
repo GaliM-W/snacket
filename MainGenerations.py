@@ -25,8 +25,8 @@ def main(stdscr):
         except Exception as err:
             raise ValueError("Board size might be too large for terminal") from err
         try:
-            for message in info:
-                stdscr.addstr(message + "\n")
+            #for message in info:
+                #stdscr.addstr(message + "\n")
             info.clear()
             for message in messages:
                 stdscr.addstr(message + "\n")
