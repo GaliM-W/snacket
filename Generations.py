@@ -74,11 +74,15 @@ def Round(
             snake.add_to_board(board)
     else:
         snake_population = list(snake_population)
+        snake_population_base = snake_population
         snakes_to_add = num_snakes - len(snake_population)
+        if snakes_to_add < 0:
+            snakes_to_add = num_snakes
+            snake_population = []
         weights = range(
-            snakes_to_add + 1, 1, -1
+            len(snake_population_base) + 1, 1, -1
         )  # favour snakes at start of list, as they tend to have higher fitness
-        new_snakes = choices(snake_population, weights=weights, k=snakes_to_add)
+        new_snakes = choices(snake_population_base, weights=weights, k=snakes_to_add)
         snake_population.extend(new_snakes)
         for snake in snake_population:
             snake = copy(snake)
@@ -166,7 +170,7 @@ def Epoch(
 
 
 if __name__ == "__main__":
-    epoch = Epoch(5, 10, 5, num_snakes=10, display=print)
+    epoch = Epoch(5, 10, 5, num_snakes=0, display=print, msg=print, info=print)
     for i, round in enumerate(epoch):
         # last round has all zeros as position, because it's freshly born snakes who have not been on a board yet
         print(f"Round {i}: {round}")
