@@ -31,6 +31,5 @@ Plots the top 5 snakes from each Generation over 1000 generations
 The lighter the colour, the higher the weight. Map from 0 (dark purple) to 1.0 (light yellow)
 * 3x3 sensor
 * Head is in the middle (1,1) and the snake is facing North  :arrow_up:
-![smartsnakerightaxcespng](https://github.com/user-attachments/assets/a59c0b5a-d8e9-44a2-a51b-50c780e9eeee)
 
-
+![food_and_walls_snakehead](https://github.com/user-attachments/assets/976593ef-6dbf-4ea7-93fe-767009f38ece)
